@@ -1,17 +1,21 @@
-'use client';
-import { useEffect } from 'react';
+"use client";
 
-import fluidCursor from '@/hooks/use-FluidCursor';
+import { useEffect } from "react";
 
-const FluidCursor = () => {
+import fluidCursor from "@/hooks/use-FluidCursor";
+
+export default function FluidCursor() {
   useEffect(() => {
     fluidCursor();
   }, []);
 
   return (
-    <div className='fixed top-0 left-0 z-2 pointer-events-none'>
-      <canvas id='fluid' className='w-screen h-screen' />
+    <div className="pointer-events-none absolute inset-0">
+      <canvas
+        id="fluid"
+        className="h-full w-full"
+        aria-hidden="true"
+      />
     </div>
   );
-};
-export default FluidCursor;
+}
