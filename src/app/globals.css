@@ -41,7 +41,7 @@ body {
   margin: 0;
   background: var(--background);
   color: var(--foreground);
-  font-family: "Segoe UI Variable", "Aptos", "Helvetica Neue", Arial, sans-serif;
+  font-family: var(--font-sans), sans-serif;
   text-rendering: optimizeLegibility;
 }
 

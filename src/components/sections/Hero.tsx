@@ -1,6 +1,9 @@
+import "@/styles/hero.css";
+
 import { ArrowDownRight, ArrowUpRight } from "lucide-react";
 
 import { LightRays } from "@/components/effects/LightRays";
+import { RotatingRole } from "@/components/effects/RotatingRole";
 import { Button } from "@/components/ui/button";
 
 export function Hero() {
@@ -23,29 +26,35 @@ export function Hero() {
 
       <div className="relative z-10 mx-auto flex h-full max-w-[100rem] flex-col px-6 py-[clamp(1.5rem,4.5dvh,3.5rem)] sm:px-10 lg:px-12 xl:px-16">
         <div className="hero-reveal flex items-center justify-between gap-6 [animation-delay:60ms]">
-          <p className="text-[0.65rem] font-bold uppercase tracking-[0.22em] text-foreground">Sebastián Villegas</p>
-          <p className="text-right text-[0.62rem] uppercase leading-5 tracking-[0.16em] text-muted-foreground">
-            Diseño y desarrollo web
-          </p>
+          <p className="text-[0.68rem] font-medium uppercase tracking-[0.12em] text-white/80">Sebastián Villegas</p>
+          <RotatingRole />
         </div>
 
         <div className="flex flex-1 items-center py-8">
           <div className="w-full max-w-[64rem]">
             <p className="hero-reveal mb-[clamp(1rem,2.5dvh,2rem)] max-w-max border border-foreground/15 bg-background/35 px-3 py-1.5 text-[0.65rem] uppercase tracking-[0.18em] text-foreground/80 backdrop-blur-md [animation-delay:100ms]">
-              Webs para negocios y marcas
+              PRODUCTOS DIGITALES A MEDIDA
             </p>
 
             <h1
               id="hero-title"
-              className="hero-title hero-reveal max-w-[11.5ch] font-medium leading-[0.88] tracking-[-0.065em] [animation-delay:140ms]"
+              className="hero-title 
+              hero-reveal 
+              max-w-[10ch] 
+              font-semibold 
+              leading-[0.96] 
+              tracking-[-0.01em] [animation-delay:140ms]"
             >
-              Una web a la altura de <span className="text-accent">tu negocio.</span>
+              De una idea a un producto digital que <span className="text-accent">realmente funciona.</span>
             </h1>
 
             <div className="hero-reveal mt-[clamp(1.5rem,4dvh,3rem)] flex max-w-[52rem] flex-col gap-6 sm:flex-row sm:items-end sm:justify-between [animation-delay:220ms]">
-              <p className="max-w-[34rem] text-sm leading-6 text-foreground/65 sm:text-base sm:leading-7">
-                Creo sitios claros, atractivos y fáciles de usar para que tus clientes entiendan lo que ofrecés y den
-                el siguiente paso.
+              <p className="hero-reveal max-w-[34rem] text-[1.05rem] leading-[1.65] text-white/65 [animation-delay:220ms]">
+                Transformo ideas en{" "}
+                <span className="font-medium text-white">
+                  productos digitales claros, funcionales y atractivos
+                </span>
+                , desde sitios web hasta aplicaciones y soluciones a medida.
               </p>
 
               <div className="flex shrink-0 flex-wrap gap-2.5">
@@ -75,13 +84,13 @@ export function Hero() {
           </div>
         </div>
 
-        <div className="hero-reveal flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-foreground/15 pt-4 text-[0.62rem] uppercase tracking-[0.17em] text-foreground/55 [animation-delay:280ms] sm:gap-x-8">
+        {/* <div className="hero-reveal flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-foreground/15 pt-4 text-[0.62rem] uppercase tracking-[0.17em] text-foreground/55 [animation-delay:280ms] sm:gap-x-8">
           <span>Sitios web</span>
           <span className="size-1 rounded-full bg-accent" />
           <span>Tiendas online</span>
           <span className="size-1 rounded-full bg-accent" />
           <span>Aplicaciones a medida</span>
-        </div>
+        </div> */}
       </div>
     </section>
   );

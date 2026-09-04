@@ -1,5 +1,5 @@
 .hero-title {
-  font-size: clamp(3.15rem, min(7.4vw, 12dvh), 7.8rem);
+  font-size: clamp(3.15rem, min(7.4vw, 10dvh), 7.8rem);
 }
 
 .hero-shade {
