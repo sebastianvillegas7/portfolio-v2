@@ -1,5 +1,7 @@
 "use client";
 
+/* eslint-disable react-hooks/refs */
+
 import { useEffect, useMemo, useRef, useState } from "react";
 import { TEXT_ANIMATOR_DEMO_CLASS } from "./text-animator-demo";
 import { cn } from "@/lib/utils";

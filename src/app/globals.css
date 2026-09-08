@@ -4,38 +4,74 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
+  /* Surfaces */
   --background: #0d0d0f;
-  --foreground: #edede7;
-  --card: #121214;
-  --card-foreground: #edede7;
-  --muted: #19191c;
-  --muted-foreground: #92928b;
-  --border: #2a2a2e;
-  --primary: #edede7;
-  --primary-foreground: #0d0d0f;
-  --ring: #8f9fff;
-  --accent: #8f9fff;
+  --surface-1: #121214;
+  --surface-2: #19191c;
+
+  /* Text */
+  --foreground: #f2f2ee;
+  --foreground-muted: #a0a0a6;
+  --foreground-subtle: #74747c;
+
+  /* Borders */
+  --border: #29292f;
+  --border-subtle: rgb(255 255 255 / 0.12);
+
+  /* Brand */
+  --brand-500: #7b8cff;
+  --brand-600: #5e4bff;
+  --brand-300: #d3d7ff;
+  --brand-soft: #a8b7ff;
+
+  /* Semantic */
+  --primary: var(--foreground);
+  --primary-foreground: var(--background);
+  --accent: var(--brand-500);
+  --ring: var(--brand-500);
+
+  /* Gradient */
+  --gradient-brand:
+    linear-gradient(
+      90deg,
+      var(--brand-600),
+      var(--brand-300),
+      var(--brand-500)
+    );
 }
 
 @theme inline {
   --color-background: var(--background);
+
+  --color-surface-1: var(--surface-1);
+  --color-surface-2: var(--surface-2);
+
   --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
+  --color-foreground-muted: var(--foreground-muted);
+  --color-foreground-subtle: var(--foreground-subtle);
+
   --color-border: var(--border);
+
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+
+  --color-brand-300: var(--brand-300);
+  --color-brand-500: var(--brand-500);
+  --color-brand-600: var(--brand-600);
+  --color-brand-soft: var(--brand-soft);
+
   --color-ring: var(--ring);
   --color-accent: var(--accent);
+
   --animate-bg-position: bg-position 3s infinite alternate;
+
   @keyframes bg-position {
-  0% {
-    background-position: 0% 50%;
+    0% {
+      background-position: 0% 50%;
     }
-  100% {
-    background-position: 100% 50%;
+
+    100% {
+      background-position: 100% 50%;
     }
   }
 }
