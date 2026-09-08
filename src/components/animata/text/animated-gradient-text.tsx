@@ -3,15 +3,15 @@ import { cn } from "@/lib/utils";
 export default function AnimatedGradientText({
   className,
   children,
-}: React.HTMLAttributes<HTMLDivElement>) {
+}: React.HTMLAttributes<HTMLSpanElement>) {
   return (
-    <div
+    <span
       className={cn(
-        "bg-size animate-bg-position bg-linear-to-r from-yellow-500 from-30% via-yellow-700 via-50% to-pink-500 to-80% bg-size-[200%_auto] bg-clip-text text-transparent",
+        "inline-block bg-size-[200%_auto] animate-bg-position bg-linear-to-r bg-clip-text text-transparent",
         className,
       )}
     >
       {children}
-    </div>
+    </span>
   );
 }

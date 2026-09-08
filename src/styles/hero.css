@@ -1,10 +1,19 @@
 .hero-title {
-  font-size: clamp(3.15rem, min(7.4vw, 10dvh), 7.8rem);
+  font-family: var(--font-sans), sans-serif;
+  font-size: clamp(3rem, 4.8vw, 4.8rem);
+  font-weight: 600;
+  line-height: 0.96;
+  letter-spacing: -0.035em;
 }
 
 .hero-shade {
   background:
-    linear-gradient(90deg, rgb(13 13 15 / 0.98) 0%, rgb(13 13 15 / 0.82) 44%, rgb(13 13 15 / 0.18) 78%),
+    linear-gradient(
+      90deg,
+      rgb(13 13 15 / 0.98) 0%,
+      rgb(13 13 15 / 0.82) 44%,
+      rgb(13 13 15 / 0.18) 78%
+    ),
     linear-gradient(0deg, rgb(13 13 15 / 0.72) 0%, transparent 42%);
 }
 
@@ -24,7 +33,7 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {  
+@media (prefers-reduced-motion: reduce) {
   .hero-reveal {
     opacity: 1;
     animation: none;
