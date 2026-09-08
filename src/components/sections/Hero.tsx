@@ -4,6 +4,8 @@ import { useState } from "react";
 
 import { ArrowDownRight, ArrowUpRight } from "lucide-react";
 
+import { AlternatingUnderline } from "@/components/effects/AlternatingUnderline";
+import FluidCursor from "@/components/effects/FluidCursor";
 import { LightRays } from "@/components/effects/LightRays";
 import { RotatingRole } from "@/components/effects/RotatingRole";
 import { Button } from "@/components/ui/button";
@@ -12,10 +14,38 @@ import "@/styles/hero.css";
 
 export function Hero() {
   const [lightPulseSignal, setLightPulseSignal] = useState(0);
+  const [underlineTarget, setUnderlineTarget] = useState<
+    "headline" | "name"
+  >("headline");
+
+  const [headlinePulseCount, setHeadlinePulseCount] = useState(0);
 
   function handleRoleChange() {
     setLightPulseSignal((current) => current + 1);
+
+    if (underlineTarget === "headline") {
+      setHeadlinePulseCount((current) => {
+        const next = current + 1;
+
+        if (next >= 3) {
+          setUnderlineTarget("name");
+          return 0;
+        }
+
+        return next;
+      });
+
+      return;
+    }
+
+    setUnderlineTarget("headline");
   }
+
+  const headlineUnderlineActive =
+    underlineTarget === "headline";
+
+  const nameUnderlineActive =
+    underlineTarget === "name";
 
   return (
     <section
@@ -23,7 +53,7 @@ export function Hero() {
       className="relative min-h-[100dvh] overflow-hidden bg-[#0d0d0f]"
       aria-labelledby="hero-title"
     >
-      <div className="pointer-events-none absolute inset-0">
+      <div className="pointer-events-none absolute inset-0 z-0">
         <LightRays
           color="#a8b7ff"
           speed={0.16}
@@ -34,12 +64,22 @@ export function Hero() {
         />
       </div>
 
-      <div className="hero-shade pointer-events-none absolute inset-0" />
+      <div className="pointer-events-none absolute inset-0 z-[1]">
+        <FluidCursor />
+      </div>
+
+      <div className="hero-shade pointer-events-none absolute inset-0 z-[2]" />
 
       <div className="relative z-10 mx-auto flex min-h-[100dvh] w-full max-w-[100rem] flex-col px-5 py-7 sm:px-8 md:px-12 lg:px-16">
         <div className="hero-reveal flex items-center justify-between gap-6 [animation-delay:60ms]">
-          <p className="text-[0.68rem] font-medium uppercase tracking-[0.12em] text-white/80">
+          <p className="relative inline-block text-[0.68rem] font-medium uppercase tracking-[0.12em] text-white/80">
             Sebastián Villegas
+
+            <AlternatingUnderline
+              active={nameUnderlineActive}
+              className="text-white/45"
+              offsetClassName="-bottom-[0.45em]"
+            />
           </p>
 
           <RotatingRole onChange={handleRoleChange} />
@@ -59,8 +99,26 @@ export function Hero() {
                 className="hero-title hero-reveal max-w-[9ch] font-semibold leading-[0.95] tracking-[-0.035em] [animation-delay:140ms]"
               >
                 De una idea a un producto digital que{" "}
-                <span className="text-[#8798ff]">
-                  realmente funciona.
+
+                <span className="relative block w-fit pb-[0.06em] text-[#8798ff]">
+                  realmente
+
+                  <AlternatingUnderline
+                    active={headlineUnderlineActive}
+                    className="text-[#8798ff]/55"
+                    offsetClassName="-bottom-[0.02em]"
+                  />
+                </span>
+
+                <span className="relative block w-fit pt-[0.03em] text-[#8798ff]">
+                  funciona.
+
+                  <AlternatingUnderline
+                    active={headlineUnderlineActive}
+                    delay={1.15}
+                    className="text-[#8798ff]/55"
+                    offsetClassName="-bottom-[0.15em]"
+                  />
                 </span>
               </h1>
 
@@ -81,10 +139,7 @@ export function Hero() {
                     </a>
                   </Button>
 
-                  <Button
-                    asChild
-                    variant="outline"
-                  >
+                  <Button asChild variant="outline">
                     <a href="#contact">
                       Hablemos
                       <ArrowUpRight className="size-4" />
