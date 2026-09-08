@@ -1,17 +1,25 @@
 /* =========================================================
    HERO
+   Base: mobile
    ========================================================= */
 
 .hero {
   position: relative;
   min-height: 100dvh;
   overflow: hidden;
+
   background: var(--background);
 }
+
+
+/* =========================================================
+   BACKGROUND
+   ========================================================= */
 
 .hero-background {
   position: absolute;
   inset: 0;
+
   pointer-events: none;
 }
 
@@ -29,16 +37,17 @@
   background:
     linear-gradient(
       90deg,
-      color-mix(in srgb, var(--background) 98%, transparent) 0%,
-      color-mix(in srgb, var(--background) 82%, transparent) 44%,
-      color-mix(in srgb, var(--background) 18%, transparent) 78%
+      color-mix(in srgb, var(--background) 96%, transparent) 0%,
+      color-mix(in srgb, var(--background) 84%, transparent) 62%,
+      color-mix(in srgb, var(--background) 50%, transparent) 100%
     ),
     linear-gradient(
       0deg,
-      color-mix(in srgb, var(--background) 72%, transparent) 0%,
-      transparent 42%
+      color-mix(in srgb, var(--background) 78%, transparent) 0%,
+      transparent 48%
     );
 }
+
 
 /* =========================================================
    LAYOUT
@@ -49,14 +58,15 @@
   z-index: 10;
 
   display: flex;
-  min-height: 100dvh;
-  width: 100%;
-  max-width: var(--page-max-width);
-  margin-inline: auto;
-
   flex-direction: column;
 
-  padding-block: 1.75rem;
+  width: 100%;
+  min-height: 100dvh;
+  max-width: var(--page-max-width);
+
+  margin-inline: auto;
+
+  padding-block: 1.5rem;
   padding-inline: var(--page-padding-x);
 }
 
@@ -64,7 +74,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1.5rem;
+
+  gap: 1rem;
 
   animation-delay: 60ms;
 }
@@ -73,31 +84,43 @@
   display: flex;
   flex: 1;
   align-items: center;
+
+  padding-block: 2rem;
 }
 
 .hero-content {
   width: 100%;
-  max-width: 58rem;
+  max-width: 100%;
 }
+
 
 /* =========================================================
    TOP BAR
    ========================================================= */
 
 .hero-name {
-  font-size: 0.68rem;
-  font-weight: 500;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  flex: 0 0 auto;
 
-  color: color-mix(in srgb, var(--foreground) 80%, transparent);
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+
+  color: color-mix(
+    in srgb,
+    var(--foreground) 80%,
+    transparent
+  );
 }
 
 .hero-roles {
-  height: 1.5rem;
-  min-width: 22rem;
+  flex: 1;
+  min-width: 0;
+  height: 1.4rem;
 
   overflow: visible;
+
   text-align: right;
 }
 
@@ -105,14 +128,20 @@
   height: 100%;
   overflow: visible;
 
-  font-size: 0.8rem;
+  font-size: 0.62rem;
   font-weight: 500;
-  line-height: 1.75rem;
-  letter-spacing: 0.16em;
+  line-height: 1.4rem;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
+  white-space: nowrap;
 
-  color: color-mix(in srgb, var(--foreground) 80%, transparent);
+  color: color-mix(
+    in srgb,
+    var(--foreground) 72%,
+    transparent
+  );
 }
+
 
 /* =========================================================
    BADGE
@@ -121,7 +150,7 @@
 .hero-badge-wrapper {
   display: inline-flex;
 
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.15rem;
   padding: 1px;
 
   border-radius: 0.18rem;
@@ -135,33 +164,41 @@
     hero-reveal 800ms cubic-bezier(0.22, 1, 0.36, 1) forwards,
     hero-gradient-position 3s ease-in-out infinite alternate;
 
-  animation-delay: 100ms, 0ms;
+  animation-delay:
+    100ms,
+    0ms;
 }
 
 .hero-badge {
   display: inline-flex;
 
-  padding: 0.5rem 0.75rem;
+  padding: 0.45rem 0.65rem;
 
   background: var(--background);
 
-  font-size: 0.68rem;
+  font-size: 0.62rem;
   font-weight: 500;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 
-  color: color-mix(in srgb, var(--foreground) 65%, transparent);
+  color: color-mix(
+    in srgb,
+    var(--foreground) 65%,
+    transparent
+  );
 }
+
 
 /* =========================================================
    HEADLINE
    ========================================================= */
 
 .hero-title {
+  width: 100%;
   max-width: 11ch;
 
   font-family: var(--font-sans), sans-serif;
-  font-size: clamp(3rem, 4.8vw, 4.8rem);
+  font-size: clamp(2.55rem, 11.5vw, 3rem);
   font-weight: 600;
   line-height: 0.96;
   letter-spacing: -0.035em;
@@ -169,6 +206,7 @@
 
 .hero-title-gradient-wrapper {
   position: relative;
+
   display: inline-block;
 
   vertical-align: baseline;
@@ -216,6 +254,7 @@
   background-image: var(--gradient-brand);
 }
 
+
 /* =========================================================
    BOTTOM
    ========================================================= */
@@ -224,25 +263,32 @@
   display: flex;
   flex-direction: column;
 
-  gap: 1.5rem;
-  margin-top: 2rem;
+  gap: 1.35rem;
+
+  margin-top: 1.75rem;
 }
 
 .hero-description {
-  max-width: 34rem;
+  max-width: 31rem;
 
-  font-size: 1.05rem;
-  line-height: 1.65;
+  font-size: 0.98rem;
+  line-height: 1.6;
 
-  color: color-mix(in srgb, var(--foreground) 65%, transparent);
+  color: color-mix(
+    in srgb,
+    var(--foreground) 65%,
+    transparent
+  );
 
   animation-delay: 220ms;
 }
 
 .hero-description strong {
   font-weight: 500;
+
   color: var(--foreground);
 }
+
 
 /* =========================================================
    ACTIONS
@@ -251,7 +297,8 @@
 .hero-actions {
   display: flex;
   align-items: center;
-  gap: 2rem;
+
+  gap: 1.75rem;
 
   animation-delay: 280ms;
 }
@@ -260,10 +307,6 @@
   display: inline-flex;
 
   transition: transform 300ms ease-out;
-}
-
-.hero-action:hover {
-  transform: scale(1.04);
 }
 
 .hero-action-label {
@@ -278,23 +321,19 @@
 }
 
 .hero-action--primary .hero-action-label {
-  color: color-mix(in srgb, var(--foreground) 80%, transparent);
+  color: color-mix(
+    in srgb,
+    var(--foreground) 80%,
+    transparent
+  );
 }
 
 .hero-action--secondary .hero-action-label {
-  color: color-mix(in srgb, var(--foreground) 60%, transparent);
-}
-
-.hero-action:hover .hero-action-label {
-  background: var(--gradient-brand);
-  background-size: 200% auto;
-  background-clip: text;
-
-  color: transparent;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-
-  animation: hero-gradient-position 3s ease-in-out infinite alternate;
+  color: color-mix(
+    in srgb,
+    var(--foreground) 60%,
+    transparent
+  );
 }
 
 .hero-action-line {
@@ -310,15 +349,17 @@
 
 .hero-action--primary .hero-action-line {
   width: 100%;
+
   opacity: 0.7;
 
-  animation: hero-gradient-position 3s ease-in-out infinite alternate;
+  animation:
+    hero-gradient-position
+    3s
+    ease-in-out
+    infinite
+    alternate;
 
   transition: opacity 500ms ease;
-}
-
-.hero-action--primary:hover .hero-action-line {
-  opacity: 1;
 }
 
 .hero-action--secondary .hero-action-line {
@@ -327,11 +368,6 @@
   transition: width 500ms ease;
 }
 
-.hero-action--secondary:hover .hero-action-line {
-  width: 100%;
-
-  animation: hero-gradient-position 3s ease-in-out infinite alternate;
-}
 
 /* =========================================================
    ENTRANCE ANIMATION
@@ -340,17 +376,23 @@
 .hero-reveal {
   opacity: 0;
 
-  animation: hero-reveal 800ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation:
+    hero-reveal
+    800ms
+    cubic-bezier(0.22, 1, 0.36, 1)
+    forwards;
 }
 
 @keyframes hero-reveal {
   from {
     opacity: 0;
+
     transform: translateY(18px);
   }
 
   to {
     opacity: 1;
+
     transform: translateY(0);
   }
 }
@@ -365,6 +407,302 @@
   }
 }
 
+
+/* =========================================================
+   INTERACTION
+   Only devices with a real hover pointer
+   ========================================================= */
+
+@media (hover: hover) and (pointer: fine) {
+  .hero-action:hover {
+    transform: scale(1.04);
+  }
+
+  .hero-action:hover .hero-action-label {
+    background: var(--gradient-brand);
+    background-size: 200% auto;
+    background-clip: text;
+
+    color: transparent;
+
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+
+    animation:
+      hero-gradient-position
+      3s
+      ease-in-out
+      infinite
+      alternate;
+  }
+
+  .hero-action--primary:hover .hero-action-line {
+    opacity: 1;
+  }
+
+  .hero-action--secondary:hover .hero-action-line {
+    width: 100%;
+
+    animation:
+      hero-gradient-position
+      3s
+      ease-in-out
+      infinite
+      alternate;
+  }
+}
+
+
+/* =========================================================
+   LARGE MOBILE
+   432px – 767px
+   ========================================================= */
+
+@media (min-width: 27rem) {
+  .hero-container {
+    padding-block: 1.75rem;
+  }
+
+  .hero-main {
+    padding-block: 2.5rem;
+  }
+
+  .hero-name {
+    font-size: 0.65rem;
+    letter-spacing: 0.11em;
+  }
+
+  .hero-roles {
+    height: 1.5rem;
+  }
+
+  .hero-roles-text {
+    font-size: 0.68rem;
+    line-height: 1.5rem;
+    letter-spacing: 0.11em;
+  }
+
+  .hero-badge {
+    padding: 0.5rem 0.75rem;
+
+    font-size: 0.65rem;
+    letter-spacing: 0.11em;
+  }
+
+  .hero-title {
+    font-size: clamp(3rem, 10.5vw, 3.65rem);
+  }
+
+  .hero-bottom {
+    gap: 1.5rem;
+
+    margin-top: 2rem;
+  }
+
+  .hero-description {
+    font-size: 1rem;
+  }
+
+  .hero-actions {
+    gap: 2rem;
+  }
+}
+
+
+/* =========================================================
+   TABLET
+   768px – 1023px
+   ========================================================= */
+
+@media (min-width: 48rem) {
+  .hero-main {
+    padding-block: 3rem;
+  }
+
+  .hero-content {
+    max-width: 52rem;
+  }
+
+  .hero-name {
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+  }
+
+  .hero-roles {
+    flex: initial;
+
+    min-width: 20rem;
+    height: 1.5rem;
+  }
+
+  .hero-roles-text {
+    font-size: 0.74rem;
+    line-height: 1.65rem;
+    letter-spacing: 0.14em;
+  }
+
+  .hero-badge-wrapper {
+    margin-bottom: 1.25rem;
+  }
+
+  .hero-badge {
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+  }
+
+  .hero-title {
+    max-width: 11ch;
+
+    font-size: clamp(3.5rem, 7.2vw, 4.25rem);
+  }
+
+  .hero-description {
+    max-width: 34rem;
+
+    font-size: 1.05rem;
+    line-height: 1.65;
+  }
+}
+
+
+/* =========================================================
+   DESKTOP
+   1024px+
+   Keeps the current desktop composition
+   ========================================================= */
+
+@media (min-width: 64rem) {
+  .hero-shade {
+    background:
+      linear-gradient(
+        90deg,
+        color-mix(
+          in srgb,
+          var(--background) 98%,
+          transparent
+        ) 0%,
+        color-mix(
+          in srgb,
+          var(--background) 82%,
+          transparent
+        ) 44%,
+        color-mix(
+          in srgb,
+          var(--background) 18%,
+          transparent
+        ) 78%
+      ),
+      linear-gradient(
+        0deg,
+        color-mix(
+          in srgb,
+          var(--background) 72%,
+          transparent
+        ) 0%,
+        transparent 42%
+      );
+  }
+
+  .hero-container {
+    padding-block: 1.75rem;
+  }
+
+  .hero-topbar {
+    gap: 1.5rem;
+  }
+
+  .hero-main {
+    padding-block: 0;
+  }
+
+  .hero-content {
+    max-width: 58rem;
+  }
+
+  .hero-name {
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+  }
+
+  .hero-roles {
+    flex: initial;
+
+    min-width: 22rem;
+    height: 1.5rem;
+  }
+
+  .hero-roles-text {
+    font-size: 0.8rem;
+    line-height: 1.75rem;
+    letter-spacing: 0.16em;
+
+    color: color-mix(
+      in srgb,
+      var(--foreground) 80%,
+      transparent
+    );
+  }
+
+  .hero-badge-wrapper {
+    margin-bottom: 1.25rem;
+  }
+
+  .hero-badge {
+    padding: 0.5rem 0.75rem;
+
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+  }
+
+  .hero-title {
+    max-width: 11ch;
+
+    font-size: clamp(3rem, 4.8vw, 4.8rem);
+  }
+
+  .hero-bottom {
+    gap: 1.5rem;
+
+    margin-top: 2rem;
+  }
+
+  .hero-description {
+    max-width: 34rem;
+
+    font-size: 1.05rem;
+    line-height: 1.65;
+  }
+
+  .hero-actions {
+    gap: 2rem;
+  }
+}
+
+
+/* =========================================================
+   LOW HEIGHT
+   Prevents cramped compositions on short screens
+   ========================================================= */
+
+@media (max-height: 42rem) and (min-width: 48rem) {
+  .hero-container {
+    padding-block: 1.25rem;
+  }
+
+  .hero-main {
+    padding-block: 1.5rem;
+  }
+
+  .hero-badge-wrapper {
+    margin-bottom: 0.9rem;
+  }
+
+  .hero-bottom {
+    margin-top: 1.5rem;
+  }
+}
+
+
 /* =========================================================
    ACCESSIBILITY
    ========================================================= */
@@ -373,6 +711,7 @@
   .hero-reveal,
   .hero-badge-wrapper {
     opacity: 1;
+
     animation: none;
   }
 
