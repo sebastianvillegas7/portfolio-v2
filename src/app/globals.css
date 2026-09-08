@@ -4,6 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
+  /* ? PALETA */
   /* Surfaces */
   --background: #0d0d0f;
   --surface-1: #121214;
@@ -31,13 +32,80 @@
   --ring: var(--brand-500);
 
   /* Gradient */
-  --gradient-brand:
-    linear-gradient(
-      90deg,
-      var(--brand-600),
-      var(--brand-300),
-      var(--brand-500)
-    );
+  --gradient-brand: linear-gradient(
+    90deg,
+    var(--brand-600),
+    var(--brand-300),
+    var(--brand-500)
+  );
+
+  /* ? LAYOUT */
+  --page-max-width: 100rem;
+
+  --page-padding-x: 1.25rem;
+
+  --section-space-y: 6rem;
+
+  --content-narrow: 42rem;
+  --content-medium: 64rem;
+  --content-wide: 80rem;
+
+  /* ? SPACING */
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1.5rem;
+  --space-lg: 2rem;
+  --space-xl: 3rem;
+  --space-2xl: 4rem;
+}
+
+.page-container {
+  width: 100%;
+  max-width: var(--page-max-width);
+  margin-inline: auto;
+  padding-inline: var(--page-padding-x);
+}
+
+.section {
+  position: relative;
+  padding-block: var(--section-space-y);
+}
+
+.section-content {
+  width: 100%;
+}
+
+.content-narrow {
+  max-width: var(--content-narrow);
+}
+
+.content-medium {
+  max-width: var(--content-medium);
+}
+
+.content-wide {
+  max-width: var(--content-wide);
+}
+
+@media (min-width: 40rem) {
+  :root {
+    --page-padding-x: 2rem;
+    --section-space-y: 7rem;
+  }
+}
+
+@media (min-width: 48rem) {
+  :root {
+    --page-padding-x: 3rem;
+    --section-space-y: 8rem;
+  }
+}
+
+@media (min-width: 64rem) {
+  :root {
+    --page-padding-x: 4rem;
+    --section-space-y: 9rem;
+  }
 }
 
 @theme inline {
