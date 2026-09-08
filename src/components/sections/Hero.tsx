@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { ArrowDownRight, ArrowUpRight } from "lucide-react";
 
-import { AlternatingUnderline } from "@/components/effects/AlternatingUnderline";
+import DoubleUnderline from "@/components/animata/text/double-underline";
 import FluidCursor from "@/components/effects/FluidCursor";
 import { LightRays } from "@/components/effects/LightRays";
 import { RotatingRole } from "@/components/effects/RotatingRole";
@@ -14,6 +14,7 @@ import "@/styles/hero.css";
 
 export function Hero() {
   const [lightPulseSignal, setLightPulseSignal] = useState(0);
+
   const [underlineTarget, setUnderlineTarget] = useState<
     "headline" | "name"
   >("headline");
@@ -38,14 +39,15 @@ export function Hero() {
       return;
     }
 
+    /*
+      El nombre permanece subrayado durante un ciclo completo
+      del texto dinámico y luego volvemos al headline.
+    */
     setUnderlineTarget("headline");
   }
 
-  const headlineUnderlineActive =
-    underlineTarget === "headline";
-
-  const nameUnderlineActive =
-    underlineTarget === "name";
+  const headlineActive = underlineTarget === "headline";
+  const nameActive = underlineTarget === "name";
 
   return (
     <section
@@ -72,15 +74,13 @@ export function Hero() {
 
       <div className="relative z-10 mx-auto flex min-h-[100dvh] w-full max-w-[100rem] flex-col px-5 py-7 sm:px-8 md:px-12 lg:px-16">
         <div className="hero-reveal flex items-center justify-between gap-6 [animation-delay:60ms]">
-          <p className="relative inline-block text-[0.68rem] font-medium uppercase tracking-[0.12em] text-white/80">
+          <DoubleUnderline
+            active={nameActive}
+            className="text-[0.68rem] font-medium uppercase tracking-[0.12em] text-white/80"
+            underlineClassName="text-white/70"
+          >
             Sebastián Villegas
-
-            <AlternatingUnderline
-              active={nameUnderlineActive}
-              className="text-white/45"
-              offsetClassName="-bottom-[0.45em]"
-            />
-          </p>
+          </DoubleUnderline>
 
           <RotatingRole onChange={handleRoleChange} />
         </div>
@@ -100,29 +100,27 @@ export function Hero() {
               >
                 De una idea a un producto digital que{" "}
 
-                <span className="relative block w-fit pb-[0.06em] text-[#8798ff]">
-                  realmente
-
-                  <AlternatingUnderline
-                    active={headlineUnderlineActive}
-                    className="text-[#8798ff]/55"
-                    offsetClassName="-bottom-[0.02em]"
-                  />
+                <span className="block w-fit text-[#8798ff]">
+                  <DoubleUnderline
+                    active={headlineActive}
+                    underlineClassName="text-[#8798ff]"
+                  >
+                    realmente
+                  </DoubleUnderline>
                 </span>
 
-                <span className="relative block w-fit pt-[0.03em] text-[#8798ff]">
-                  funciona.
-
-                  <AlternatingUnderline
-                    active={headlineUnderlineActive}
-                    delay={1.15}
-                    className="text-[#8798ff]/55"
-                    offsetClassName="-bottom-[0.15em]"
-                  />
+                <span className="mt-[0.035em] block w-fit text-[#8798ff]">
+                  <DoubleUnderline
+                    active={headlineActive}
+                    delay={900}
+                    underlineClassName="text-[#8798ff]"
+                  >
+                    funciona.
+                  </DoubleUnderline>
                 </span>
               </h1>
 
-              <div className="mt-7 flex flex-col gap-6 lg:flex-row lg:items-center lg:gap-8">
+              <div className="mt-8 flex flex-col gap-6 lg:flex-row lg:items-center lg:gap-8">
                 <p className="hero-reveal max-w-[34rem] text-[1.05rem] leading-[1.65] text-white/65 [animation-delay:220ms]">
                   Transformo ideas en{" "}
                   <span className="font-medium text-white">
