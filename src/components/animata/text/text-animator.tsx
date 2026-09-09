@@ -326,10 +326,22 @@ function cleanupLoop(c: LoopController) {
   clearStage(c.stage);
 }
 
-function registerAnimation(c: LoopController, a: Animation): Animation {
-  c.animations.add(a);
-  void a.finished.finally(() => c.animations.delete(a));
-  return a;
+function registerAnimation(
+  c: LoopController,
+  animation: Animation,
+): Animation {
+  c.animations.add(animation);
+
+  void animation.finished.then(
+    () => {
+      c.animations.delete(animation);
+    },
+    () => {
+      c.animations.delete(animation);
+    },
+  );
+
+  return animation;
 }
 
 function schedule(c: LoopController, cb: () => void, delay: number) {
