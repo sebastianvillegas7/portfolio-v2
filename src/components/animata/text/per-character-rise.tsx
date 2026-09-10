@@ -87,7 +87,7 @@ export default function PerCharacterRise({
               <span
                 key={`${character}-${index}`}
                 data-rise-char
-                className="inline-block"
+                className="per-character-rise-char inline-block"
               >
                 {character}
               </span>
@@ -97,7 +97,7 @@ export default function PerCharacterRise({
           {wordIndex < words.length - 1 && (
             <span
               data-rise-char
-              className="inline-block whitespace-pre"
+              className="per-character-rise-char inline-block whitespace-pre"
             >
               {" "}
             </span>

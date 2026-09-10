@@ -10,6 +10,8 @@ import PerCharacterRise from "@/components/animata/text/per-character-rise";
 import FluidCursor from "@/components/effects/FluidCursor";
 import { LightRays } from "@/components/effects/LightRays";
 
+import { useMediaQuery } from "@/hooks/use-media-query";
+
 import "@/styles/hero.css";
 
 const ROLES = [
@@ -28,6 +30,8 @@ const HEADLINE_GRADIENT_DELAY = 4300;
 export function Hero() {
   const [showHeadlineGradient, setShowHeadlineGradient] = useState(false);
 
+  const isMobile = useMediaQuery("(max-width: 47.999rem)");
+
   useEffect(() => {
     const timeout = window.setTimeout(() => {
       setShowHeadlineGradient(true);
@@ -45,10 +49,10 @@ export function Hero() {
       <div className="hero-background hero-background--light">
         <LightRays
           color="#a8b7ff"
-          speed={0.16}
-          spread={1.15}
-          length={1.6}
-          pointerInfluence={0.018}
+          speed={isMobile ? 0.13 : 0.16}
+          spread={isMobile ? 1.4 : 1.15}
+          length={isMobile ? 1.9 : 1.6}
+          pointerInfluence={isMobile ? 0.012 : 0.018}
         />
       </div>
 
