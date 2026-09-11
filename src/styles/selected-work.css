@@ -1,0 +1,489 @@
+/* =========================================================
+   SELECTED WORK
+   Base: mobile
+   ========================================================= */
+
+.selected-work {
+  overflow: hidden;
+
+  background:
+    radial-gradient(
+      circle at 78% 18%,
+      color-mix(in srgb, var(--brand-600) 12%, transparent),
+      transparent 34%
+    ),
+    var(--background);
+}
+
+.selected-work-header {
+  display: grid;
+  gap: 1.5rem;
+
+  margin-bottom: 3.5rem;
+}
+
+.selected-work-heading {
+  max-width: 42rem;
+}
+
+.selected-work-eyebrow {
+  margin: 0 0 0.9rem;
+
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+
+  color: var(--brand-soft);
+}
+
+.selected-work-title {
+  max-width: 10ch;
+
+  margin: 0;
+
+  font-size: clamp(2.35rem, 11vw, 3.2rem);
+  font-weight: 600;
+  line-height: 0.98;
+  letter-spacing: -0.04em;
+
+  color: var(--foreground);
+}
+
+.selected-work-intro {
+  max-width: 31rem;
+
+  margin: 0;
+
+  font-size: 0.98rem;
+  line-height: 1.65;
+
+  color: var(--foreground-muted);
+}
+
+/* =========================================================
+   MAIN PROJECT / 21ST SHOWCASE
+   ========================================================= */
+
+.selected-work-main {
+  position: relative;
+
+  margin-bottom: 5rem;
+}
+
+.selected-work-main .project-showcase {
+  max-width: none;
+}
+
+.selected-work-main .project-showcase > div:last-child {
+  position: relative;
+}
+
+.selected-work-main .project-showcase a {
+  display: block;
+}
+
+.selected-work-main .project-showcase a > div {
+  padding-block: 1.8rem;
+}
+
+.selected-work-main .project-showcase h3 {
+  font-size: clamp(1.9rem, 8vw, 2.65rem);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.035em;
+}
+
+.selected-work-main .project-showcase p {
+  max-width: 40rem;
+
+  font-size: 0.95rem;
+  line-height: 1.65;
+}
+
+.selected-work-main .project-showcase::before {
+  content: "";
+
+  position: absolute;
+  inset: -1rem;
+
+  z-index: -1;
+
+  border: 1px solid var(--border-subtle);
+  border-radius: 1rem;
+
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--surface-1) 72%, transparent),
+      color-mix(in srgb, var(--background) 92%, transparent)
+    );
+
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.025),
+    0 1.5rem 4rem rgb(0 0 0 / 0.18);
+}
+
+/* =========================================================
+   SECONDARY PROJECTS
+   ========================================================= */
+
+.selected-work-secondary {
+  display: grid;
+  gap: 4.5rem;
+}
+
+.selected-work-magic-card {
+  position: relative;
+
+  min-height: 0;
+
+  overflow: hidden;
+
+  border: 1px solid var(--border-subtle);
+  border-radius: 1rem;
+
+  background: color-mix(
+    in srgb,
+    var(--surface-1) 88%,
+    transparent
+  );
+}
+
+.selected-work-card {
+  position: relative;
+  z-index: 1;
+
+  width: 100%;
+}
+
+.selected-work-card-link {
+  display: block;
+}
+
+.selected-work-card-media {
+  position: relative;
+
+  aspect-ratio: 16 / 10;
+
+  overflow: hidden;
+
+  background: var(--surface-2);
+}
+
+.selected-work-card-media::after {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  pointer-events: none;
+
+  background:
+    linear-gradient(
+      180deg,
+      transparent 62%,
+      color-mix(in srgb, var(--background) 38%, transparent)
+    );
+}
+
+.selected-work-card-media img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  transition:
+    transform 800ms cubic-bezier(0.22, 1, 0.36, 1),
+    filter 500ms ease;
+}
+
+.selected-work-card-body {
+  padding: 1.4rem 1.25rem 1.5rem;
+}
+
+.selected-work-card-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 1rem;
+
+  margin-bottom: 1.25rem;
+
+  font-family: var(--font-mono), monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+
+  color: var(--foreground-subtle);
+}
+
+.selected-work-card-meta span:last-child {
+  text-align: right;
+
+  color: var(--brand-soft);
+}
+
+.selected-work-card-title {
+  margin: 0;
+
+  font-size: clamp(1.65rem, 7vw, 2.2rem);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.035em;
+
+  color: var(--foreground);
+}
+
+.selected-work-card-location {
+  margin: 0.65rem 0 0;
+
+  font-size: 0.78rem;
+  line-height: 1.4;
+
+  color: var(--foreground-subtle);
+}
+
+.selected-work-card-description {
+  max-width: 34rem;
+
+  margin: 1rem 0 0;
+
+  font-size: 0.92rem;
+  line-height: 1.65;
+
+  color: var(--foreground-muted);
+}
+
+.selected-work-card-technologies {
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 0.45rem;
+
+  margin-top: 1.15rem;
+}
+
+.selected-work-card-technologies span {
+  padding: 0.4rem 0.58rem;
+
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+
+  font-size: 0.64rem;
+  line-height: 1;
+
+  color: var(--foreground-subtle);
+
+  background: color-mix(
+    in srgb,
+    var(--surface-2) 78%,
+    transparent
+  );
+}
+
+.selected-work-card-cta {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 0.5rem;
+
+  margin-top: 1.4rem;
+
+  font-size: 0.82rem;
+  font-weight: 500;
+
+  color: var(--foreground);
+
+  transition:
+    color 300ms ease,
+    transform 300ms ease;
+}
+
+.selected-work-card-cta span:last-child {
+  color: var(--brand-soft);
+
+  transition: transform 300ms ease;
+}
+
+/* =========================================================
+   MOBILE SEPARATION
+   ========================================================= */
+
+@media (max-width: 47.999rem) {
+  .selected-work-secondary {
+    gap: 5.5rem;
+  }
+
+  .selected-work-magic-card {
+    overflow: visible;
+
+    border-color: color-mix(
+      in srgb,
+      var(--border-subtle) 70%,
+      transparent
+    );
+
+    background: transparent;
+  }
+
+  .selected-work-magic-card + .selected-work-magic-card::before {
+    content: "";
+
+    position: absolute;
+    top: -2.75rem;
+    left: 0;
+
+    width: 100%;
+    height: 1px;
+
+    background:
+      linear-gradient(
+        90deg,
+        transparent,
+        var(--border-subtle) 18%,
+        var(--border-subtle) 82%,
+        transparent
+      );
+  }
+
+  .selected-work-card-body {
+    padding-inline: 0;
+    padding-bottom: 0;
+  }
+
+  .selected-work-card-media {
+    border: 1px solid var(--border-subtle);
+    border-radius: 0.85rem;
+  }
+
+  .selected-work-card-meta {
+    margin-top: 1.15rem;
+  }
+}
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (min-width: 48rem) {
+  .selected-work-header {
+    grid-template-columns: minmax(0, 1.2fr) minmax(18rem, 0.8fr);
+    align-items: end;
+
+    gap: 3rem;
+
+    margin-bottom: 4.5rem;
+  }
+
+  .selected-work-title {
+    font-size: clamp(3.2rem, 7vw, 4.5rem);
+  }
+
+  .selected-work-intro {
+    justify-self: end;
+
+    font-size: 1rem;
+  }
+
+  .selected-work-main {
+    margin-bottom: 3rem;
+  }
+
+  .selected-work-main .project-showcase::before {
+    inset: -1.4rem;
+
+    border-radius: 1.2rem;
+  }
+
+  .selected-work-secondary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: 1.5rem;
+  }
+
+  .selected-work-card-body {
+    padding: 1.5rem;
+  }
+
+  .selected-work-card-title {
+    font-size: clamp(1.8rem, 3vw, 2.45rem);
+  }
+}
+
+/* =========================================================
+   DESKTOP
+   ========================================================= */
+
+@media (min-width: 64rem) {
+  .selected-work-header {
+    margin-bottom: 5.5rem;
+  }
+
+  .selected-work-title {
+    font-size: clamp(3.6rem, 5.2vw, 5rem);
+  }
+
+  .selected-work-intro {
+    max-width: 28rem;
+
+    font-size: 1.02rem;
+  }
+
+  .selected-work-main {
+    margin-bottom: 2.5rem;
+  }
+
+  .selected-work-main .project-showcase a > div {
+    padding-block: 2.25rem;
+  }
+
+  .selected-work-main .project-showcase h3 {
+    font-size: clamp(2.5rem, 3.2vw, 3.5rem);
+  }
+
+  .selected-work-main .project-showcase p {
+    font-size: 1rem;
+  }
+
+  .selected-work-secondary {
+    gap: 1.75rem;
+  }
+
+  .selected-work-card-body {
+    padding: 1.75rem;
+  }
+}
+
+/* =========================================================
+   DESKTOP INTERACTION
+   ========================================================= */
+
+@media (hover: hover) and (pointer: fine) {
+  .selected-work-card-link:hover .selected-work-card-media img {
+    transform: scale(1.035);
+  }
+
+  .selected-work-card-link:hover .selected-work-card-cta {
+    color: var(--brand-300);
+  }
+
+  .selected-work-card-link:hover
+    .selected-work-card-cta
+    span:last-child {
+    transform: translate(0.18rem, -0.18rem);
+  }
+}
+
+/* =========================================================
+   ACCESSIBILITY
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .selected-work-card-media img,
+  .selected-work-card-cta,
+  .selected-work-card-cta span {
+    transition: none;
+  }
+}
