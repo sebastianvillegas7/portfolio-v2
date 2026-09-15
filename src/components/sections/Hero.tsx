@@ -7,7 +7,6 @@ import BlurOutUp from "@/components/animata/text/blur-out-up";
 import GibberishText from "@/components/animata/text/gibberish-text";
 import PerCharacterRise from "@/components/animata/text/per-character-rise";
 
-import FluidCursor from "@/components/effects/FluidCursor";
 import { LightRays } from "@/components/effects/LightRays";
 
 import { useMediaQuery } from "@/hooks/use-media-query";
@@ -55,12 +54,6 @@ export function Hero() {
           pointerInfluence={isMobile ? 0.012 : 0.018}
         />
       </div>
-
-      <div className="hero-background hero-background--fluid">
-        <FluidCursor />
-      </div>
-
-      <div className="hero-background hero-shade" />
 
       <div className="hero-container">
         <div className="hero-topbar hero-reveal">

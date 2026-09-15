@@ -22,21 +22,6 @@
     var(--color-bg);
 }
 
-.selected-work::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: -56px;
-  height: 56px;
-  pointer-events: none;
-  background: linear-gradient(
-    180deg,
-    rgba(7, 9, 18, 0) 0%,
-    rgba(7, 9, 18, 0.96) 100%
-  );
-}
-
 /* =========================================================
    HEADER
    ========================================================= */
