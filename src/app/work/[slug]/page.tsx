@@ -23,11 +23,14 @@ export default async function WorkPage({ params }: WorkPageProps) {
       <p className="text-sm text-muted-foreground">
         {project.category} · {project.location}
       </p>
-      <h1 className="mt-3 text-4xl font-semibold tracking-tight md:text-6xl">{project.title}</h1>
-      <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground">{project.description}</p>
-      <div className="mt-12">
-        
-      </div>
+
+      <h1 className="mt-3 text-4xl font-semibold tracking-tight md:text-6xl">
+        {project.title}
+      </h1>
+
+      <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground">
+        {project.description}
+      </p>
     </article>
   );
 }

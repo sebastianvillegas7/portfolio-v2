@@ -91,7 +91,7 @@
   align-items: flex-start;
 
   padding-top: clamp(6.5rem, 13dvh, 8rem);
-  padding-bottom: 2rem;
+  padding-bottom: 1rem;
 }
 
 .hero-content {
@@ -146,7 +146,7 @@
 .hero-badge-wrapper {
   display: inline-flex;
 
-  margin-bottom: 1.35rem;
+  margin-bottom: clamp(2.8rem, 6dvh, 3.8rem);
   padding: 1px;
 
   border-radius: 0.18rem;
@@ -185,6 +185,7 @@
 .hero-title {
   width: 100%;
   max-width: 11ch;
+  margin: 0;
 
   font-family: var(--font-sans), sans-serif;
   font-size: clamp(2.55rem, 11.5vw, 3rem);
@@ -251,13 +252,14 @@
   display: flex;
   flex-direction: column;
 
-  gap: 1.5rem;
+  gap: clamp(2rem, 4dvh, 2.6rem);
 
-  margin-top: 2.1rem;
+  margin-top: clamp(3.5rem, 8dvh, 5rem);
 }
 
 .hero-description {
   max-width: 31rem;
+  margin: 0;
 
   font-size: 0.98rem;
   line-height: 1.6;
@@ -401,7 +403,6 @@
 
 /* =========================================================
    INTERACTION
-   Only devices with a real hover pointer
    ========================================================= */
 
 @media (hover: hover) and (pointer: fine) {
@@ -445,7 +446,7 @@
 
   .hero-main {
     padding-top: clamp(7rem, 13dvh, 8.5rem);
-    padding-bottom: 2rem;
+    padding-bottom: 1rem;
   }
 
   .hero-name {
@@ -472,12 +473,6 @@
 
   .hero-title {
     font-size: clamp(3rem, 10.5vw, 3.65rem);
-  }
-
-  .hero-bottom {
-    gap: 1.5rem;
-
-    margin-top: 2.1rem;
   }
 
   .hero-description {
@@ -542,6 +537,12 @@
     font-size: clamp(3.5rem, 7.2vw, 4.25rem);
   }
 
+  .hero-bottom {
+    gap: 1.5rem;
+
+    margin-top: 2.1rem;
+  }
+
   .hero-description {
     max-width: 34rem;
 
@@ -553,7 +554,6 @@
 /* =========================================================
    DESKTOP
    1024px+
-   Keeps the current desktop composition
    ========================================================= */
 
 @media (min-width: 64rem) {
@@ -651,7 +651,6 @@
 
 /* =========================================================
    LOW HEIGHT
-   Prevents cramped compositions on short screens
    ========================================================= */
 
 @media (max-height: 42rem) and (min-width: 48rem) {
