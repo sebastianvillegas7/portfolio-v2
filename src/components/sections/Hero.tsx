@@ -7,10 +7,6 @@ import BlurOutUp from "@/components/animata/text/blur-out-up";
 import GibberishText from "@/components/animata/text/gibberish-text";
 import PerCharacterRise from "@/components/animata/text/per-character-rise";
 
-import { LightRays } from "@/components/effects/LightRays";
-
-import { useMediaQuery } from "@/hooks/use-media-query";
-
 import "@/styles/hero.css";
 
 const ROLES = [
@@ -29,8 +25,6 @@ const HEADLINE_GRADIENT_DELAY = 4300;
 export function Hero() {
   const [showHeadlineGradient, setShowHeadlineGradient] = useState(false);
 
-  const isMobile = useMediaQuery("(max-width: 47.999rem)");
-
   useEffect(() => {
     const timeout = window.setTimeout(() => {
       setShowHeadlineGradient(true);
@@ -45,15 +39,6 @@ export function Hero() {
       className="hero"
       aria-labelledby="hero-title"
     >
-      <div className="hero-background hero-background--light">
-        <LightRays
-          color="#a8b7ff"
-          speed={isMobile ? 0.13 : 0.16}
-          spread={isMobile ? 1.4 : 1.15}
-          length={isMobile ? 1.9 : 1.6}
-          pointerInfluence={isMobile ? 0.012 : 0.018}
-        />
-      </div>
 
       <div className="hero-container">
         <div className="hero-topbar hero-reveal">
