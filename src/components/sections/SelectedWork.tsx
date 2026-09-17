@@ -15,32 +15,33 @@ import { featuredProjects } from "@/data/projects";
 import "@/styles/selected-work.css";
 
 export function SelectedWork() {
-  const titleRef = useRef<HTMLDivElement>(null);
+  const titleRef =
+    useRef<HTMLDivElement>(null);
 
   const { scrollYProgress } = useScroll({
     target: titleRef,
-    offset: ["start 32%", "start 12%"],
+    offset: [
+      "start 32%",
+      "start 12%",
+    ],
   });
 
-  const smoothTitleProgress = useSpring(
-    scrollYProgress,
-    {
-      stiffness: 90,
-      damping: 26,
-      mass: 0.35,
-    },
-  );
+  const smoothTitleProgress =
+    useSpring(
+      scrollYProgress,
+      {
+        stiffness: 90,
+        damping: 26,
+        mass: 0.35,
+      },
+    );
 
-  /*
-   * En el último tramo antes del sticky
-   * compensa unos pocos píxeles hacia abajo.
-   * Visualmente parece que desacelera.
-   */
-  const titleY = useTransform(
-    smoothTitleProgress,
-    [0, 1],
-    [0, 10],
-  );
+  const titleY =
+    useTransform(
+      smoothTitleProgress,
+      [0, 1],
+      [0, 10],
+    );
 
   return (
     <section
@@ -50,27 +51,28 @@ export function SelectedWork() {
     >
       <div className="page-container relative z-10">
         <div className="selected-work-stage">
-          <motion.div
-            ref={titleRef}
-            className="selected-work-title-pin"
-            style={{
-              y: titleY,
-            }}
-          >
-            <p className="selected-work-eyebrow">
-              Selected Work
-            </p>
-
-            <h2
-              id="selected-work-title"
-              className="selected-work-title"
-            >
-              Trabajo seleccionado
-            </h2>
-          </motion.div>
-
           <ProjectStickyStack
             projects={featuredProjects}
+            title={
+              <motion.div
+                ref={titleRef}
+                className="selected-work-title-pin"
+                style={{
+                  y: titleY,
+                }}
+              >
+                <p className="selected-work-eyebrow">
+                  Selected Work
+                </p>
+
+                <h2
+                  id="selected-work-title"
+                  className="selected-work-title"
+                >
+                  Trabajo seleccionado
+                </h2>
+              </motion.div>
+            }
             intro={
               <>
                 Una selección de productos digitales,

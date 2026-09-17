@@ -171,6 +171,12 @@ export function GlobalLight() {
 
   const animationRef =
     useRef<number | null>(null);
+  
+  const lastReactUpdateRef =
+    useRef(0);
+
+  const isMobileRef =
+    useRef(false);
 
   /*
    * Actualiza React y mantiene una copia exacta
@@ -178,8 +184,22 @@ export function GlobalLight() {
    */
   const updateLight = (
     value: LightState,
+    force = false,
   ) => {
     currentLightRef.current = value;
+
+    const now = performance.now();
+
+    if (
+      !force &&
+      isMobileRef.current &&
+      now - lastReactUpdateRef.current < 33
+    ) {
+      return;
+    }
+
+    lastReactUpdateRef.current = now;
+
     setLight(value);
   };
 
@@ -312,6 +332,7 @@ export function GlobalLight() {
       else {
         updateLight(
           selectedEndHidden,
+          true,
         );
 
         animationRef.current = null;
@@ -403,7 +424,7 @@ export function GlobalLight() {
           (elapsed - 2) / 1.3,
         );
       } else {
-        updateLight(HERO_LIGHT);
+        updateLight(HERO_LIGHT, true,);
 
         animationRef.current = null;
 
@@ -425,6 +446,11 @@ export function GlobalLight() {
   };
 
   useEffect(() => {
+    isMobileRef.current =
+      window.matchMedia(
+        "(max-width: 767px)",
+      ).matches;
+
     const updateSection = () => {
       const selected =
         document.getElementById("work");
