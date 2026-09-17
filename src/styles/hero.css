@@ -5,7 +5,7 @@
 
 .hero {
   position: relative;
-  min-height: 100dvh;
+  min-height: 100svh;
   overflow: hidden;
 
   background: var(--background);
@@ -66,7 +66,7 @@
   flex-direction: column;
 
   width: 100%;
-  min-height: 100dvh;
+  min-height: 100svh;
   max-width: var(--page-max-width);
 
   margin-inline: auto;
@@ -90,7 +90,7 @@
   flex: 1;
   align-items: flex-start;
 
-  padding-top: clamp(6.5rem, 13dvh, 8rem);
+  padding-top: clamp(6.5rem, 13svh, 8rem);
   padding-bottom: 1rem;
 }
 
@@ -146,7 +146,7 @@
 .hero-badge-wrapper {
   display: inline-flex;
 
-  margin-bottom: clamp(2.8rem, 6dvh, 3.8rem);
+  margin-bottom: clamp(2.8rem, 6svh, 3.8rem);
   padding: 1px;
 
   border-radius: 0.18rem;
@@ -252,9 +252,9 @@
   display: flex;
   flex-direction: column;
 
-  gap: clamp(2rem, 4dvh, 2.6rem);
+  gap: clamp(2rem, 4svh, 2.6rem);
 
-  margin-top: clamp(3.5rem, 8dvh, 5rem);
+  margin-top: clamp(3.5rem, 8svh, 5rem);
 }
 
 .hero-description {
@@ -445,7 +445,7 @@
   }
 
   .hero-main {
-    padding-top: clamp(7rem, 13dvh, 8.5rem);
+    padding-top: clamp(7rem, 13svh, 8.5rem);
     padding-bottom: 1rem;
   }
 

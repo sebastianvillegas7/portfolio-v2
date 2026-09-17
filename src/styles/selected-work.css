@@ -5,36 +5,44 @@
 
 .selected-work {
   position: relative;
+
   margin-top: -1px;
   padding-top: 3.5rem;
 
   background: var(--background);
 }
 
+.selected-work-stage {
+  position: relative;
+}
+
 /* =========================================================
-   HEADER
+   TITLE
    ========================================================= */
 
-.selected-work-header {
-  margin-bottom: 3.25rem;
+.selected-work-title-pin {
+  position: sticky;
+
+  top: 2rem;
+
+  z-index: 50;
+
+  width: fit-content;
+  max-width: 100%;
+
+  pointer-events: none;
 }
 
 .selected-work-eyebrow {
-  margin: 0 0 0.85rem;
+  margin: 0 0 0.75rem;
 
   font-size: 0.64rem;
   font-weight: 500;
   letter-spacing: 0.16em;
+
   text-transform: uppercase;
 
   color: var(--brand-soft);
-}
-
-.selected-work-header-content {
-  display: flex;
-  flex-direction: column;
-
-  gap: 1.25rem;
 }
 
 .selected-work-title {
@@ -42,7 +50,13 @@
 
   margin: 0;
 
-  font-size: clamp(2.5rem, 11vw, 3.2rem);
+  font-size:
+    clamp(
+      2.5rem,
+      11vw,
+      3.2rem
+    );
+
   font-weight: 600;
   line-height: 0.96;
   letter-spacing: -0.04em;
@@ -50,48 +64,109 @@
   color: var(--foreground);
 }
 
+/* =========================================================
+   STACK STAGE
+   ========================================================= */
+
+.project-sticky-stack {
+  position: relative;
+  margin-top: 4.4rem;
+
+  --project-stack-top: 11.6rem;
+  --project-layer-gap: 1.5rem;
+}
+
+/* =========================================================
+   SINGLE STICKY VIEWPORT
+   ========================================================= */
+
+.project-sticky-viewport {
+  position: sticky;
+
+  top: var(--project-stack-top);
+
+  display: grid;
+
+  width: 100%;
+
+  /*
+   * Intro y todas las cards ocupan
+   * exactamente la misma zona.
+   */
+  isolation: isolate;
+}
+
+/* =========================================================
+   INTRO
+   ========================================================= */
+
 .selected-work-intro {
+  position: relative;
+
+  z-index: 10;
+
+  grid-area: 1 / 1;
+
+  align-self: start;
+
   max-width: 30rem;
 
   margin: 0;
 
   font-size: 0.94rem;
-  line-height: 1.65;
+  line-height: 1.7;
 
   color: var(--foreground-muted);
+
+  pointer-events: none;
+
+  will-change:
+    opacity,
+    transform;
 }
 
 /* =========================================================
-   STACK
+   CARDS
    ========================================================= */
 
-.project-sticky-stack {
-  position: relative;
-}
-
 .project-sticky-card {
-  position: sticky;
+  position: relative;
 
-  top: calc(
-    1rem + (var(--stack-index) * 1.15rem)
-  );
+  grid-area: 1 / 1;
+
+  /*
+   * Las siguientes cards terminan un poco
+   * más abajo para dejar visibles las anteriores.
+   */
+  top:
+    calc(
+      var(--stack-index) *
+        var(--project-layer-gap)
+    );
 
   width: 100%;
 
-  margin-bottom: 2.5rem;
-
   overflow: hidden;
 
-  border: 1px solid var(--border-subtle);
+  border:
+    1px solid
+    var(--border-subtle);
+
   border-radius: 1rem;
 
   background: var(--surface-1);
 
   box-shadow:
-    0 1.2rem 3rem rgb(0 0 0 / 0.22),
-    inset 0 1px 0 rgb(255 255 255 / 0.025);
+    0 1.2rem 3rem
+      rgb(0 0 0 / 0.22),
+    inset 0 1px 0
+      rgb(255 255 255 / 0.025);
 
   transform-origin: center top;
+
+  will-change:
+    transform,
+    opacity;
 }
 
 /* =========================================================
@@ -113,25 +188,40 @@
   object-fit: cover;
 
   transition:
-    transform 550ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform
+      550ms
+      cubic-bezier(
+        0.22,
+        1,
+        0.36,
+        1
+      ),
     filter 400ms ease;
 }
 
 .project-sticky-media-shade {
   position: absolute;
+
   inset: 0;
 
   pointer-events: none;
 
-  background: linear-gradient(180deg, transparent 70%, rgb(0 0 0 / 0.2));
+  background:
+    linear-gradient(
+      180deg,
+      transparent 70%,
+      rgb(0 0 0 / 0.2)
+    );
 }
 
 .project-sticky-number {
   position: absolute;
+
   top: 0.85rem;
   left: 0.85rem;
 
   display: flex;
+
   align-items: center;
   justify-content: center;
 
@@ -140,12 +230,16 @@
 
   padding-inline: 0.5rem;
 
-  border: 1px solid rgb(255 255 255 / 0.18);
+  border:
+    1px solid
+    rgb(255 255 255 / 0.18);
+
   border-radius: 999px;
 
   backdrop-filter: blur(10px);
 
-  background: rgb(13 13 15 / 0.68);
+  background:
+    rgb(13 13 15 / 0.68);
 
   font-size: 0.62rem;
   font-weight: 500;
@@ -159,11 +253,20 @@
    ========================================================= */
 
 .project-sticky-content {
-  padding: 1.4rem 1.3rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+
+  min-height: 19.5rem;
+
+  padding:
+    1.4rem
+    1.3rem
+    1.5rem;
 }
 
 .project-sticky-meta {
   display: flex;
+
   align-items: center;
   justify-content: space-between;
 
@@ -174,6 +277,7 @@
   font-size: 0.6rem;
   font-weight: 500;
   letter-spacing: 0.12em;
+
   text-transform: uppercase;
 
   color: var(--brand-soft);
@@ -191,6 +295,7 @@
 
 .project-sticky-heading {
   display: flex;
+
   align-items: center;
 
   gap: 0.65rem;
@@ -199,7 +304,13 @@
 .project-sticky-heading h3 {
   margin: 0;
 
-  font-size: clamp(1.85rem, 8vw, 2.35rem);
+  font-size:
+    clamp(
+      1.85rem,
+      8vw,
+      2.35rem
+    );
+
   font-weight: 600;
   line-height: 1;
   letter-spacing: -0.035em;
@@ -211,9 +322,12 @@
   width: 1rem;
   height: 1rem;
 
+  flex: 0 0 auto;
+
   color: var(--brand-soft);
 
-  transition: transform 300ms ease;
+  transition:
+    transform 300ms ease;
 }
 
 .project-sticky-location {
@@ -242,16 +356,19 @@
 
 .project-sticky-footer {
   display: flex;
+
   flex-direction: column;
   align-items: flex-start;
 
   gap: 1.25rem;
 
-  margin-top: 1.3rem;
+  margin-top: auto;
+  padding-top: 1.35rem;
 }
 
 .project-sticky-technologies {
   display: flex;
+
   flex-wrap: wrap;
 
   gap: 0.42rem;
@@ -260,10 +377,18 @@
 .project-sticky-technologies span {
   padding: 0.4rem 0.6rem;
 
-  border: 1px solid var(--border-subtle);
+  border:
+    1px solid
+    var(--border-subtle);
+
   border-radius: 999px;
 
-  background: color-mix(in srgb, var(--surface-2) 70%, transparent);
+  background:
+    color-mix(
+      in srgb,
+      var(--surface-2) 70%,
+      transparent
+    );
 
   font-size: 0.6rem;
   line-height: 1;
@@ -288,6 +413,7 @@
   content: "";
 
   position: absolute;
+
   bottom: 0;
   left: 0;
 
@@ -303,86 +429,100 @@
    TOUCH
    ========================================================= */
 
-.project-sticky-link:active .project-sticky-image {
+.project-sticky-link:active
+  .project-sticky-image {
   transform: scale(1.018);
 }
 
-.project-sticky-link:active .project-sticky-arrow {
-  transform: translate(0.16rem, -0.16rem);
+.project-sticky-link:active
+  .project-sticky-arrow {
+  transform:
+    translate(
+      0.16rem,
+      -0.16rem
+    );
 }
 
 /* =========================================================
    LARGE MOBILE
-   432px+
    ========================================================= */
 
 @media (min-width: 27rem) {
   .selected-work {
-    padding-block: 4.5rem 6.5rem;
+    padding-top: 4.5rem;
   }
 
-  .selected-work-header {
-    margin-bottom: 3.75rem;
+  .selected-work-title-pin {
+    top: 2.1rem;
+  }
+
+  .project-sticky-stack {
+    margin-top: 4.6rem;
+
+    --project-stack-top: 12rem;
+    --project-layer-gap: 1.6rem;
   }
 
   .project-sticky-content {
-    padding: 1.5rem 1.4rem 1.6rem;
-  }
+    min-height: 19rem;
 
-  .project-sticky-end-space {
-    height: 56svh;
+    padding:
+      1.5rem
+      1.4rem
+      1.6rem;
   }
 }
 
 /* =========================================================
    TABLET
-   768px+
    ========================================================= */
 
 @media (min-width: 48rem) {
   .selected-work {
-    padding-block: 6rem 8rem;
+    padding-top: 6rem;
   }
 
-  .selected-work-header {
-    margin-bottom: 4.5rem;
-  }
-
-  .selected-work-header-content {
-    display: grid;
-    grid-template-columns:
-      minmax(0, 1fr)
-      minmax(18rem, 0.72fr);
-
-    align-items: end;
-
-    gap: 3rem;
+  .selected-work-title-pin {
+    top: 1.75rem;
   }
 
   .selected-work-title {
-    font-size: clamp(3.5rem, 7vw, 4.6rem);
+    max-width: none;
+
+    font-size:
+      clamp(
+        3.5rem,
+        7vw,
+        4.6rem
+      );
+  }
+
+  .project-sticky-stack {
+    margin-top: 4rem;
+
+    --project-stack-top: 9.8rem;
+    --project-layer-gap: 1.8rem;
   }
 
   .selected-work-intro {
-    justify-self: end;
+    width:
+      min(
+        31rem,
+        46%
+      );
+
+    margin-left: auto;
 
     font-size: 1rem;
   }
 
   .project-sticky-card {
-    top: calc(4.5rem + (var(--stack-index) * 2.75rem));
-
-    margin-bottom: 26svh;
-
     border-radius: 1.2rem;
-  }
-
-  .project-sticky-card:last-child {
-    margin-bottom: 0;
   }
 
   .project-sticky-link {
     display: grid;
+
     grid-template-columns:
       minmax(0, 1.25fr)
       minmax(19rem, 0.75fr);
@@ -390,12 +530,13 @@
 
   .project-sticky-media {
     aspect-ratio: auto;
+
     min-height: 28rem;
   }
 
   .project-sticky-content {
-    display: flex;
-    flex-direction: column;
+    min-height: 0;
+
     justify-content: center;
 
     padding: 2rem;
@@ -403,41 +544,41 @@
 
   .project-sticky-footer {
     margin-top: 1.5rem;
+    padding-top: 0;
   }
 }
 
 /* =========================================================
    DESKTOP
-   1024px+
    ========================================================= */
 
 @media (min-width: 64rem) {
   .selected-work {
-    padding-block: 7rem 9rem;
+    padding-top: 7rem;
   }
 
-  .selected-work-header {
-    margin-bottom: 5rem;
+  .selected-work-title-pin {
+    top: 2rem;
   }
 
   .selected-work-title {
-    font-size: clamp(3.8rem, 5vw, 5rem);
+    font-size:
+      clamp(
+        3.8rem,
+        5vw,
+        5rem
+      );
   }
 
   .project-sticky-stack {
-    max-width: var(--content-wide);
+    max-width:
+      var(--content-wide);
 
     margin-inline: auto;
-  }
+    margin-top: 4rem;
 
-  .project-sticky-card {
-    top: calc(4rem + (var(--stack-index) * 3rem));
-
-    margin-bottom: 24svh;
-  }
-
-  .project-sticky-card:last-child {
-    margin-bottom: 0;
+    --project-stack-top: 10.2rem;
+    --project-layer-gap: 1.9rem;
   }
 
   .project-sticky-link {
@@ -455,7 +596,12 @@
   }
 
   .project-sticky-heading h3 {
-    font-size: clamp(2.7rem, 3.4vw, 3.6rem);
+    font-size:
+      clamp(
+        2.7rem,
+        3.4vw,
+        3.6rem
+      );
   }
 
   .project-sticky-description {
@@ -467,13 +613,20 @@
    POINTER
    ========================================================= */
 
-@media (hover: hover) and (pointer: fine) {
-  .project-sticky-link:hover .project-sticky-image {
+@media (hover: hover)
+  and (pointer: fine) {
+  .project-sticky-link:hover
+    .project-sticky-image {
     transform: scale(1.03);
   }
 
-  .project-sticky-link:hover .project-sticky-arrow {
-    transform: translate(0.18rem, -0.18rem);
+  .project-sticky-link:hover
+    .project-sticky-arrow {
+    transform:
+      translate(
+        0.18rem,
+        -0.18rem
+      );
   }
 }
 
@@ -481,7 +634,10 @@
    REDUCED MOTION
    ========================================================= */
 
-@media (prefers-reduced-motion: reduce) {
+@media (
+  prefers-reduced-motion:
+    reduce
+) {
   .project-sticky-image,
   .project-sticky-arrow {
     transition: none;

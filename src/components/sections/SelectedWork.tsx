@@ -9,32 +9,35 @@ export function SelectedWork() {
   return (
     <section
       id="work"
-      className="selected-work overflow-hidden"
+      className="selected-work"
       aria-labelledby="selected-work-title"
     >
-
       <div className="page-container relative z-10">
-        <header className="selected-work-header">
-          <p className="selected-work-eyebrow">
-            Selected Work
-          </p>
+        <div className="selected-work-stage">
+          <div className="selected-work-title-pin">
+            <p className="selected-work-eyebrow">
+              Selected Work
+            </p>
 
-          <div className="selected-work-header-content">
             <h2
               id="selected-work-title"
               className="selected-work-title"
             >
               Trabajo seleccionado
             </h2>
-
-            <p className="selected-work-intro">
-              Una selección de productos digitales, experiencias web y
-              e-commerce desarrollados para necesidades reales.
-            </p>
           </div>
-        </header>
 
-        <ProjectStickyStack projects={featuredProjects} />
+          <ProjectStickyStack
+            projects={featuredProjects}
+            intro={
+              <>
+                Una selección de productos digitales,
+                experiencias web y e-commerce desarrollados
+                para necesidades reales.
+              </>
+            }
+          />
+        </div>
       </div>
     </section>
   );
