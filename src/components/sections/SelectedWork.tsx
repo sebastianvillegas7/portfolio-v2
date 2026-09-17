@@ -1,11 +1,47 @@
 "use client";
 
+import { useRef } from "react";
+
+import {
+  motion,
+  useScroll,
+  useSpring,
+  useTransform,
+} from "motion/react";
+
 import { ProjectStickyStack } from "@/components/project/ProjectStickyStack";
 import { featuredProjects } from "@/data/projects";
 
 import "@/styles/selected-work.css";
 
 export function SelectedWork() {
+  const titleRef = useRef<HTMLDivElement>(null);
+
+  const { scrollYProgress } = useScroll({
+    target: titleRef,
+    offset: ["start 32%", "start 12%"],
+  });
+
+  const smoothTitleProgress = useSpring(
+    scrollYProgress,
+    {
+      stiffness: 90,
+      damping: 26,
+      mass: 0.35,
+    },
+  );
+
+  /*
+   * En el último tramo antes del sticky
+   * compensa unos pocos píxeles hacia abajo.
+   * Visualmente parece que desacelera.
+   */
+  const titleY = useTransform(
+    smoothTitleProgress,
+    [0, 1],
+    [0, 10],
+  );
+
   return (
     <section
       id="work"
@@ -14,7 +50,13 @@ export function SelectedWork() {
     >
       <div className="page-container relative z-10">
         <div className="selected-work-stage">
-          <div className="selected-work-title-pin">
+          <motion.div
+            ref={titleRef}
+            className="selected-work-title-pin"
+            style={{
+              y: titleY,
+            }}
+          >
             <p className="selected-work-eyebrow">
               Selected Work
             </p>
@@ -25,7 +67,7 @@ export function SelectedWork() {
             >
               Trabajo seleccionado
             </h2>
-          </div>
+          </motion.div>
 
           <ProjectStickyStack
             projects={featuredProjects}

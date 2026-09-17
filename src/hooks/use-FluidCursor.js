@@ -7,7 +7,7 @@ const useFluidCursor = () => {
 
   let config = {
     SIM_RESOLUTION: 128,
-    DYE_RESOLUTION: 1440,
+    DYE_RESOLUTION: isMobile ? 512 : 1440,
     CAPTURE_RESOLUTION: 512,
 
     DENSITY_DISSIPATION: isMobile ? 2.4 : 3.5,
