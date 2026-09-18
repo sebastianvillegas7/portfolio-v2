@@ -1,10 +1,18 @@
+export type ProjectPreview = {
+  desktop: string;
+  mobile: string;
+};
+
 export type Project = {
   slug: string;
   title: string;
   client?: string;
 
   location: string;
+
   country: string;
+  countryCode: string;
+
   year: number;
 
   category: string;
@@ -15,6 +23,9 @@ export type Project = {
   technologies: string[];
 
   cover: string;
+
+  preview: ProjectPreview;
+
   images: string[];
 
   url?: string;

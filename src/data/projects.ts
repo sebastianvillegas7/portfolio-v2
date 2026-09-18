@@ -5,13 +5,19 @@ export const projects: Project[] = [
     slug: "revia-cloud",
     title: "Revia Cloud",
     client: "Revia Cloud",
+
     location: "España",
+
     country: "España",
+    countryCode: "es",
+
     year: 2026,
-    category: "Cloud / Sitio corporativo",
+
+    category:
+      "Cloud / Sitio corporativo",
 
     description:
-      "Presencia digital para una empresa de soluciones cloud orientadas al entorno empresarial, con foco en seguridad, almacenamiento y colaboración.",
+      "Desarrollo web para una empresa europea de soluciones cloud que comercializa tecnología de vBoxx, proveedor holandés especializado en almacenamiento y colaboración empresarial.",
 
     longDescription:
       "Diseño y desarrollo de un sitio corporativo para Revia Cloud, una empresa especializada en soluciones de cloud privado para empresas en España. El proyecto presenta de forma clara sus servicios de almacenamiento, sincronización y transferencia segura de archivos, junto con planes comerciales y canales de contacto.",
@@ -25,7 +31,16 @@ export const projects: Project[] = [
       "AOS",
     ],
 
-    cover: "/images/projects/revia-cloud-cover.webp",
+    cover:
+      "/images/projects/revia-cloud-cover.webp",
+
+    preview: {
+      desktop:
+        "/images/projects/revia-cloud-cover.webp",
+
+      mobile:
+        "/images/projects/revia-cloud-mobile.jpeg",
+    },
 
     images: [
       "/images/projects/revia-cloud-01.webp",
@@ -33,7 +48,8 @@ export const projects: Project[] = [
       "/images/projects/revia-cloud-03.webp",
     ],
 
-    url: "https://reviacloud.es/",
+    url:
+      "https://reviacloud.es/",
 
     featured: true,
     order: 1,
@@ -43,10 +59,16 @@ export const projects: Project[] = [
     slug: "pancho-vina",
     title: "Pancho Viña",
     client: "Pancho Viña",
+
     location: "España",
+
     country: "España",
+    countryCode: "es",
+
     year: 2026,
-    category: "E-commerce / Shopify",
+
+    category:
+      "E-commerce / Shopify",
 
     description:
       "Tienda online especializada en vinos europeos, desarrollada sobre Shopify para combinar catálogo, venta y contenido en una experiencia de compra completa.",
@@ -58,7 +80,21 @@ export const projects: Project[] = [
       "Shopify",
     ],
 
-    cover: "/images/projects/pancho-vina-cover.webp",
+    cover:
+      "/images/projects/pancho-vina-cover.webp",
+
+    /*
+     * Temporalmente usamos cover en ambos.
+     * Cuando tengamos sus dos capturas,
+     * solo cambiamos estas rutas.
+     */
+    preview: {
+      desktop:
+        "/images/projects/pancho-vina-cover.webp",
+
+      mobile:
+        "/images/projects/pancho-vina-cover.webp",
+    },
 
     images: [
       "/images/projects/pancho-vina-01.webp",
@@ -66,7 +102,8 @@ export const projects: Project[] = [
       "/images/projects/pancho-vina-03.webp",
     ],
 
-    url: "https://panchovina.com/",
+    url:
+      "https://panchovina.com/",
 
     featured: true,
     order: 2,
@@ -76,10 +113,19 @@ export const projects: Project[] = [
     slug: "tts-studio",
     title: "TTs Studio",
     client: "TTs Studio",
-    location: "Sunnyside, Queens",
-    country: "Estados Unidos",
+
+    location:
+      "Sunnyside, Queens",
+
+    country:
+      "Estados Unidos",
+
+    countryCode: "us",
+
     year: 2026,
-    category: "Beauty / Diseño web",
+
+    category:
+      "Beauty / Diseño web",
 
     description:
       "Experiencia web para un estudio especializado en lashes & brows, combinando una estética premium con servicios, promociones y reserva de citas.",
@@ -96,7 +142,16 @@ export const projects: Project[] = [
       "AOS",
     ],
 
-    cover: "/images/projects/tts-studio-cover.webp",
+    cover:
+      "/images/projects/tts-studio-cover.webp",
+
+    preview: {
+      desktop:
+        "/images/projects/tts-studio-cover.webp",
+
+      mobile:
+        "/images/projects/tts-studio-cover.webp",
+    },
 
     images: [
       "/images/projects/tts-studio-01.webp",
@@ -109,6 +164,13 @@ export const projects: Project[] = [
   },
 ];
 
-export const featuredProjects = projects
-  .filter((project) => project.featured)
-  .sort((a, b) => a.order - b.order);
+export const featuredProjects =
+  projects
+    .filter(
+      (project) =>
+        project.featured,
+    )
+    .sort(
+      (a, b) =>
+        a.order - b.order,
+    );

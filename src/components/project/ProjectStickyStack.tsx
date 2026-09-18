@@ -2,7 +2,6 @@
 
 import { useRef, type ReactNode } from "react";
 
-import Image from "next/image";
 import Link from "next/link";
 
 import { ArrowUpRight } from "lucide-react";
@@ -15,8 +14,11 @@ import {
   type MotionValue,
 } from "motion/react";
 
-import type { Project } from "@/types/project";
+import { CountryFlag } from "@/components/project/CountryFlag";
+
 import { ProjectDevicePreview } from "@/components/project/ProjectDevicePreview";
+
+import type { Project } from "@/types/project";
 
 type ProjectStickyStackProps = {
   projects: Project[];
@@ -51,12 +53,14 @@ function getEntryWindow(index: number, total: number) {
 
   return {
     start,
+
     end: start + (index === 1 ? 0.26 : 0.18),
   };
 }
 
 function getScalePoints(index: number, total: number) {
   const input: number[] = [0];
+
   const output: number[] = [1];
 
   let currentScale = 1;
@@ -95,9 +99,7 @@ function ProjectStickyCard({
   const { start, end } = getEntryWindow(index, total);
 
   /*
-   * PRIMERA CARD
-   *
-   * Usa el mismo progress que las demás.
+   * Primera card.
    */
   const firstWindow = getEntryWindow(0, total);
 
@@ -107,15 +109,18 @@ function ProjectStickyCard({
     progress,
     [
       firstWindow.start,
+
       firstWindow.start + firstTravel * 0.68,
+
       firstWindow.start + firstTravel * 0.9,
+
       firstWindow.end,
     ],
     ["38vh", "10vh", "3vh", "0vh"],
   );
 
   /*
-   * TERCERA CARD
+   * Tercera y posteriores.
    */
   const stackedCardY = useTransform(
     progress,
@@ -124,10 +129,7 @@ function ProjectStickyCard({
   );
 
   /*
-   * SEGUNDA CARD
-   *
-   * Mantiene el recorrido y
-   * frenado ya aprobado.
+   * Segunda card.
    */
   const secondCardTravel = end - start;
 
@@ -135,9 +137,13 @@ function ProjectStickyCard({
     progress,
     [
       Math.max(0, start - 0.04),
+
       start,
+
       start + secondCardTravel * 0.68,
+
       start + secondCardTravel * 0.9,
+
       end,
     ],
     ["72vh", "72vh", "18vh", "5vh", "0vh"],
@@ -146,8 +152,8 @@ function ProjectStickyCard({
   const y = index === 0 ? firstCardY : index === 1 ? secondCardY : stackedCardY;
 
   /*
-   * Compresión durante la
-   * entrada de la tercera.
+   * Compresión al entrar
+   * la tercera card.
    */
   const thirdWindow =
     total >= 3
@@ -166,13 +172,15 @@ function ProjectStickyCard({
     [0, thirdWindow.start, thirdWindow.end],
     [
       `${expandedTop}rem`,
+
       `${expandedTop}rem`,
+
       `${total >= 3 ? compressedTop : expandedTop}rem`,
     ],
   );
 
   /*
-   * OPACITY
+   * Opacity.
    */
   const firstCardOpacity = useTransform(
     progress,
@@ -189,39 +197,26 @@ function ProjectStickyCard({
   const opacity = index === 0 ? firstCardOpacity : stackedCardOpacity;
 
   /*
-   * PROFUNDIDAD
+   * Scale.
    */
-  const { input: scaleInput, output: scaleOutput } = getScalePoints(
-    index,
-    total,
-  );
+  const {
+    input: scaleInput,
+
+    output: scaleOutput,
+  } = getScalePoints(index, total);
 
   const scale = useTransform(progress, scaleInput, scaleOutput);
 
-  const countryFlag =
-    project.country === "España"
-      ? "🇪🇸"
-      : project.country === "Estados Unidos"
-        ? "🇺🇸"
-        : "🌎";
-
-  const desktopPreview =
-    project.slug === "revia-cloud"
-      ? "/images/projects/revia-cloud-desktop.webp"
-      : project.cover;
-
-  const mobilePreview =
-    project.slug === "revia-cloud"
-      ? "/images/projects/revia-cloud-mobile.webp"
-      : project.cover;
-
-  const middle = Math.ceil(project.technologies.length / 2);
+  const firstRowLength =
+    project.technologies.length > 6
+      ? Math.ceil(project.technologies.length / 2)
+      : project.technologies.length;
 
   const technologyRows =
-    project.technologies.length > 3
+    project.technologies.length > 6
       ? [
-          project.technologies.slice(0, middle),
-          project.technologies.slice(middle),
+          project.technologies.slice(0, firstRowLength),
+          project.technologies.slice(firstRowLength),
         ]
       : [project.technologies];
 
@@ -230,6 +225,7 @@ function ProjectStickyCard({
       className="project-sticky-card"
       style={{
         zIndex: 20 + index,
+
         top,
         y,
         opacity,
@@ -238,35 +234,39 @@ function ProjectStickyCard({
     >
       <Link href={`/work/${project.slug}`} className="project-sticky-link">
         <div className="project-sticky-media">
-          <ProjectDevicePreview
-            desktopSrc={desktopPreview}
-            mobileSrc={mobilePreview}
-            title={project.title}
-          />
+          <div className="project-sticky-media-header">
+            <span className="project-sticky-number">
+              {String(index + 1).padStart(2, "0")}
+            </span>
 
-          <div className="project-sticky-number">
-            {String(index + 1).padStart(2, "0")}
+            <span className="project-sticky-featured-label">
+              Proyecto destacado
+            </span>
           </div>
+
+          <ProjectDevicePreview
+            desktopSrc={project.preview.desktop}
+            mobileSrc={project.preview.mobile}
+            title={project.title}
+            priority={index === 0}
+          />
         </div>
 
         <div className="project-sticky-content">
           <div className="project-sticky-meta">
             <span>{project.category}</span>
-
-            <span>
-              {index + 1} / {total}
-            </span>
           </div>
 
           <div className="project-sticky-title-row">
             <h3>{project.title}</h3>
 
             <span className="project-sticky-country">
-              <span className="project-sticky-flag" aria-hidden="true">
-                {countryFlag}
-              </span>
+              <CountryFlag
+                code={project.countryCode}
+                country={project.country}
+              />
 
-              {project.country}
+              <span>{project.country}</span>
             </span>
           </div>
 
@@ -306,36 +306,22 @@ export function ProjectStickyStack({
 }: ProjectStickyStackProps) {
   const timelineRef = useRef<HTMLDivElement>(null);
 
-  /*
-   * Timeline de animaciones.
-   * No cambia.
-   */
   const timelineHeight = 125 + Math.max(projects.length - 1, 0) * 72;
 
-  /*
-   * Tiempo extra después de
-   * terminar la tercera.
-   */
   const stickyHeight = timelineHeight + 70;
 
   const { scrollYProgress } = useScroll({
     target: timelineRef,
+
     offset: ["start 82%", "end 18%"],
   });
 
-  /*
-   * Intro
-   */
   const progress = useSpring(scrollYProgress, {
     stiffness: 105,
     damping: 30,
     mass: 0.3,
   });
 
-  /*
-   * Las tres cards comparten
-   * este mismo progress.
-   */
   const cardProgress = useSpring(scrollYProgress, {
     stiffness: 72,
     damping: 24,
@@ -361,31 +347,15 @@ export function ProjectStickyStack({
         minHeight: `calc(${stickyHeight}svh + var(--project-timeline-top))`,
       }}
     >
-      {/*
-        La timeline sigue siendo independiente.
-        Conservamos los mismos timings de las cards.
-      */}
       <div
         ref={timelineRef}
         aria-hidden="true"
+        className="project-sticky-timeline"
         style={{
-          position: "absolute",
-          top: "var(--project-timeline-top)",
-          left: 0,
-          width: "1px",
           height: `${timelineHeight}svh`,
-          pointerEvents: "none",
         }}
       />
 
-      {/*
-        UN ÚNICO STICKY.
-
-        Título + intro + cards pertenecen
-        físicamente al mismo bloque sticky.
-
-        Cuando éste se libera, se va TODO junto.
-      */}
       <div className="project-sticky-scene">
         {title}
 
@@ -394,6 +364,7 @@ export function ProjectStickyStack({
             className="selected-work-intro"
             style={{
               opacity: introOpacity,
+
               y: introY,
             }}
           >
