@@ -232,7 +232,12 @@ function ProjectStickyCard({
         scale,
       }}
     >
-      <Link href={`/work/${project.slug}`} className="project-sticky-link">
+      <Link
+        href={project.url!}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="project-sticky-link"
+      >
         <div className="project-sticky-media">
           <div className="project-sticky-media-header">
             <span className="project-sticky-number">

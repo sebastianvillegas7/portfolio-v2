@@ -13,8 +13,7 @@ export const projects: Project[] = [
 
     year: 2026,
 
-    category:
-      "Cloud / Sitio corporativo",
+    category: "Cloud / Sitio corporativo",
 
     description:
       "Desarrollo web para una empresa europea de soluciones cloud que comercializa tecnología de vBoxx, proveedor holandés especializado en almacenamiento y colaboración empresarial.",
@@ -22,24 +21,14 @@ export const projects: Project[] = [
     longDescription:
       "Diseño y desarrollo de un sitio corporativo para Revia Cloud, una empresa especializada en soluciones de cloud privado para empresas en España. El proyecto presenta de forma clara sus servicios de almacenamiento, sincronización y transferencia segura de archivos, junto con planes comerciales y canales de contacto.",
 
-    technologies: [
-      "HTML",
-      "CSS",
-      "JavaScript",
-      "Bootstrap",
-      "GSAP",
-      "AOS",
-    ],
+    technologies: ["HTML", "CSS", "JavaScript", "Bootstrap", "GSAP", "AOS"],
 
-    cover:
-      "/images/projects/revia-cloud-cover.webp",
+    cover: "/images/projects/revia-cloud-cover.webp",
 
     preview: {
-      desktop:
-        "/images/projects/revia-cloud-cover.webp",
+      desktop: "/images/projects/revia-cloud-cover.webp",
 
-      mobile:
-        "/images/projects/revia-cloud-mobile.jpeg",
+      mobile: "/images/projects/revia-cloud-mobile.jpeg",
     },
 
     images: [
@@ -48,8 +37,7 @@ export const projects: Project[] = [
       "/images/projects/revia-cloud-03.webp",
     ],
 
-    url:
-      "https://reviacloud.es/",
+    url: "https://reviacloud.es/",
 
     featured: true,
     order: 1,
@@ -67,8 +55,7 @@ export const projects: Project[] = [
 
     year: 2026,
 
-    category:
-      "E-commerce / Shopify",
+    category: "E-commerce / Shopify",
 
     description:
       "Tienda online especializada en vinos europeos, desarrollada sobre Shopify para combinar catálogo, venta y contenido en una experiencia de compra completa.",
@@ -76,24 +63,14 @@ export const projects: Project[] = [
     longDescription:
       "Desarrollo y personalización de un e-commerce especializado en vinos de alta gama procedentes principalmente de bodegas italianas y francesas. La tienda integra un amplio catálogo de productos, colecciones, promociones por cantidad, membresías, eventos, bodegas asociadas, carrito y proceso de compra dentro del ecosistema Shopify.",
 
-    technologies: [
-      "Shopify",
-    ],
+    technologies: ["Shopify"],
 
-    cover:
-      "/images/projects/pancho-vina-cover.webp",
+    cover: "/images/projects/pancho-vina-cover.webp",
 
-    /*
-     * Temporalmente usamos cover en ambos.
-     * Cuando tengamos sus dos capturas,
-     * solo cambiamos estas rutas.
-     */
     preview: {
-      desktop:
-        "/images/projects/pancho-vina-cover.webp",
+      desktop: "/images/projects/pancho-vina-cover.webp",
 
-      mobile:
-        "/images/projects/pancho-vina-cover.webp",
+      mobile: "/images/projects/pancho-vina-mobile.jpeg",
     },
 
     images: [
@@ -102,8 +79,7 @@ export const projects: Project[] = [
       "/images/projects/pancho-vina-03.webp",
     ],
 
-    url:
-      "https://panchovina.com/",
+    url: "https://panchovina.com/",    
 
     featured: true,
     order: 2,
@@ -114,18 +90,15 @@ export const projects: Project[] = [
     title: "TTs Studio",
     client: "TTs Studio",
 
-    location:
-      "Sunnyside, Queens",
+    location: "Sunnyside, Queens",
 
-    country:
-      "Estados Unidos",
+    country: "Estados Unidos",
 
     countryCode: "us",
 
     year: 2026,
 
-    category:
-      "Beauty / Diseño web",
+    category: "Beauty / Diseño web",
 
     description:
       "Experiencia web para un estudio especializado en lashes & brows, combinando una estética premium con servicios, promociones y reserva de citas.",
@@ -133,24 +106,14 @@ export const projects: Project[] = [
     longDescription:
       "Diseño y desarrollo del sitio web de TTs Studio, un estudio especializado en brows & lashes ubicado en Sunnyside, Queens. El proyecto combina una identidad visual premium con presentación de servicios, promociones, productos, contenido del estudio y llamadas a la acción orientadas a facilitar la reserva de citas.",
 
-    technologies: [
-      "HTML",
-      "CSS",
-      "JavaScript",
-      "Bootstrap",
-      "Swiper",
-      "AOS",
-    ],
+    technologies: ["HTML", "CSS", "JavaScript", "Bootstrap", "Swiper", "AOS"],
 
-    cover:
-      "/images/projects/tts-studio-cover.webp",
+    cover: "/images/projects/tts-studio-cover.webp",
 
     preview: {
-      desktop:
-        "/images/projects/tts-studio-cover.webp",
+      desktop: "/images/projects/tts-studio-cover.webp",
 
-      mobile:
-        "/images/projects/tts-studio-cover.webp",
+      mobile: "/images/projects/tts-studio-mobile.jpeg",
     },
 
     images: [
@@ -159,18 +122,13 @@ export const projects: Project[] = [
       "/images/projects/tts-studio-03.webp",
     ],
 
+    url: "https://ttsbeautystudio.com/",
+
     featured: true,
     order: 3,
   },
 ];
 
-export const featuredProjects =
-  projects
-    .filter(
-      (project) =>
-        project.featured,
-    )
-    .sort(
-      (a, b) =>
-        a.order - b.order,
-    );
+export const featuredProjects = projects
+  .filter((project) => project.featured)
+  .sort((a, b) => a.order - b.order);
