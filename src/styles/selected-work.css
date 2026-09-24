@@ -543,6 +543,28 @@
     1.2rem;
 }
 
+.project-sticky-cover-shadow {
+  position: absolute;
+
+  z-index: 30;
+
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  height: 48%;
+
+  pointer-events: none;
+
+  background:
+    linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgb(0 0 0 / 0.18) 35%,
+      rgb(0 0 0 / 0.62) 100%
+    );
+}
+
 .project-sticky-meta {
   display: flex;
 

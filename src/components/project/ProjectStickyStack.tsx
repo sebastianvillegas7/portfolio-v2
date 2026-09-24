@@ -165,7 +165,7 @@ function ProjectStickyCard({
 
   const expandedTop = index * 4;
 
-  const compressedTop = index * 3.1;
+  const compressedTop = index * 3.4;
 
   const top = useTransform(
     progress,
@@ -190,8 +190,8 @@ function ProjectStickyCard({
 
   const stackedCardOpacity = useTransform(
     progress,
-    [start, start + 0.045, end],
-    [0, 0.32, 1],
+    [start, start + 0.055, end],
+    [0.72, 0.9, 1],
   );
 
   const opacity = index === 0 ? firstCardOpacity : stackedCardOpacity;
@@ -245,7 +245,7 @@ function ProjectStickyCard({
             </span>
 
             <span className="project-sticky-featured-label">
-              Proyecto destacado
+              {project.title}
             </span>
           </div>
 
@@ -299,7 +299,7 @@ function ProjectStickyCard({
             </span>
           </div>
         </div>
-      </Link>
+      </Link>      
     </motion.article>
   );
 }
