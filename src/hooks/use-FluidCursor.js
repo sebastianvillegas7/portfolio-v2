@@ -1,3 +1,4 @@
+import { globalPerformanceState } from "@/components/effects/global-performance-state";
 // @ts-nocheck
 const useFluidCursor = () => {
   const canvas = document.getElementById("fluid");
@@ -914,26 +915,52 @@ const useFluidCursor = () => {
   let colorUpdateTimer = 0.0;
   let animationStarted = false;
 
+  let animationFrameId = null;
+  let destroyed = false;
+
   function startAnimation() {
-    if (animationStarted) return;
+    if (animationStarted || destroyed) return;
 
     animationStarted = true;
     lastUpdateTime = Date.now();
 
-    update();
+    animationFrameId = requestAnimationFrame(update);
   }
 
   function update() {
-    const dt = calcDeltaTime();
+    if (destroyed) return;
 
-    if (resizeCanvas()) initFramebuffers();
+    /*
+     * En mobile el scroll tiene prioridad.
+     *
+     * Conservamos el último frame del canvas,
+     * pero evitamos ejecutar toda la simulación
+     * WebGL mientras la página se desplaza.
+     */
+    const shouldPauseSimulation =
+      !globalPerformanceState.isDocumentVisible ||
+      (isMobile && globalPerformanceState.isScrolling);
 
-    updateColors(dt);
-    applyInputs();
-    step(dt);
-    render(null);
+    if (!shouldPauseSimulation) {
+      const dt = calcDeltaTime();
 
-    requestAnimationFrame(update);
+      if (resizeCanvas()) {
+        initFramebuffers();
+      }
+
+      updateColors(dt);
+      applyInputs();
+      step(dt);
+      render(null);
+    } else {
+      /*
+       * Evita que al reanudar tengamos un dt
+       * artificialmente grande.
+       */
+      lastUpdateTime = Date.now();
+    }
+
+    animationFrameId = requestAnimationFrame(update);
   }
 
   function calcDeltaTime() {
@@ -1501,6 +1528,16 @@ const useFluidCursor = () => {
     }
     return hash;
   }
+
+  return function cleanupFluidCursor() {
+    destroyed = true;
+    animationStarted = false;
+
+    if (animationFrameId !== null) {
+      cancelAnimationFrame(animationFrameId);
+      animationFrameId = null;
+    }
+  };
 };
 
 export default useFluidCursor;

@@ -365,7 +365,7 @@ export function ProjectStickyStack({
         {title}
 
         <div className="project-sticky-viewport">
-          <motion.p
+          {/* <motion.p
             className="selected-work-intro"
             style={{
               opacity: introOpacity,
@@ -374,7 +374,10 @@ export function ProjectStickyStack({
             }}
           >
             {intro}
-          </motion.p>
+          </motion.p> */}
+          <p className="selected-work-intro">
+            {intro}
+          </p>
 
           {projects.map((project, index) => (
             <ProjectStickyCard

@@ -6,7 +6,7 @@ import fluidCursor from "@/hooks/use-FluidCursor";
 
 export default function FluidCursor() {
   useEffect(() => {
-    fluidCursor();
+    return fluidCursor();
   }, []);
 
   return (

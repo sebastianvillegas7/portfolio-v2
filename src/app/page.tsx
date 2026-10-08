@@ -1,5 +1,4 @@
-import FluidCursor from "@/components/effects/FluidCursor";
-import { GlobalLight } from "@/components/effects/GlobalLight";
+import { GlobalEffects } from "@/components/effects/GlobalEffects";
 
 import { About } from "@/components/sections/About";
 import { Contact } from "@/components/sections/Contact";
@@ -13,9 +12,7 @@ export default function Home() {
   return (
     <>
       <div className="pointer-events-none fixed left-0 top-0 z-[1] h-[100lvh] w-screen">
-        <GlobalLight />
-
-        <FluidCursor />
+        <GlobalEffects />
 
         <div
           className="absolute inset-0"
