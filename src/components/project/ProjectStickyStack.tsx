@@ -299,7 +299,7 @@ function ProjectStickyCard({
             </span>
           </div>
         </div>
-      </Link>      
+      </Link>
     </motion.article>
   );
 }
@@ -313,18 +313,12 @@ export function ProjectStickyStack({
 
   const timelineHeight = 125 + Math.max(projects.length - 1, 0) * 72;
 
-  const stickyHeight = timelineHeight + 70;
+  const stickyHeight = timelineHeight + 95;
 
   const { scrollYProgress } = useScroll({
     target: timelineRef,
 
     offset: ["start 82%", "end 18%"],
-  });
-
-  const progress = useSpring(scrollYProgress, {
-    stiffness: 105,
-    damping: 30,
-    mass: 0.3,
   });
 
   const cardProgress = useSpring(scrollYProgress, {
@@ -333,16 +327,12 @@ export function ProjectStickyStack({
     mass: 0.42,
   });
 
-  const introOpacity = useTransform(
-    progress,
-    [0, 0.16, 0.21, 0.3],
-    [1, 1, 0.85, 0],
-  );
+  const firstCardWindow = getEntryWindow(0, projects.length);
 
-  const introY = useTransform(
-    progress,
-    [0, 0.06, 0.12, 0.16, 0.3],
-    [0, 8, 10, 10, -12],
+  const introOpacity = useTransform(
+    cardProgress,
+    [0, firstCardWindow.start, firstCardWindow.start + 0.055],
+    [1, 1, 0],
   );
 
   return (
@@ -365,19 +355,14 @@ export function ProjectStickyStack({
         {title}
 
         <div className="project-sticky-viewport">
-          {/* <motion.p
+          <motion.p
             className="selected-work-intro"
             style={{
               opacity: introOpacity,
-
-              y: introY,
             }}
           >
             {intro}
-          </motion.p> */}
-          <p className="selected-work-intro">
-            {intro}
-          </p>
+          </motion.p>
 
           {projects.map((project, index) => (
             <ProjectStickyCard
