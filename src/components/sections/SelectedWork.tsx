@@ -10,6 +10,7 @@ import {
 } from "motion/react";
 
 import { ProjectStickyStack } from "@/components/project/ProjectStickyStack";
+import { SectionHeading } from "@/components/ui/SectionHeading";
 import { featuredProjects } from "@/data/projects";
 
 import "@/styles/selected-work.css";
@@ -61,16 +62,11 @@ export function SelectedWork() {
                   y: titleY,
                 }}
               >
-                <p className="selected-work-eyebrow">
-                  Selected Work
-                </p>
-
-                <h2
-                  id="selected-work-title"
-                  className="selected-work-title"
-                >
-                  Trabajo seleccionado
-                </h2>
+                <SectionHeading
+                  eyebrow="Selected Work"
+                  title="Trabajo seleccionado"
+                  titleId="selected-work-title"
+                />
               </motion.div>
             }
             intro={

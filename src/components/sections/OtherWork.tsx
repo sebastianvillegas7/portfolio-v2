@@ -1,21 +1,45 @@
 "use client";
 
+import { motion } from "motion/react";
+
 import FeatureCarousel from "@/components/feature-carousel";
 import VerticalTabs from "@/components/vertical-tabs";
+import { SectionHeading } from "@/components/ui/SectionHeading";
 
 export function OtherWork() {
   return (
-    <section id="OtherWork" className="border-b border-border/50 py-20 md:py-28">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        <div className="mb-10 md:mb-14">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
-            More projects
-          </p>
-
-          <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">
-            Other Work
-          </h2>
-        </div>
+    <section
+      id="OtherWork"
+      className="section"
+      aria-labelledby="other-work-title"
+      style={{
+        paddingTop:
+          "calc(var(--section-space-y) + 3rem)",
+      }}
+    >
+      <motion.div
+        className="page-container"
+        initial={{
+          opacity: 0,
+        }}
+        whileInView={{
+          opacity: 1,
+        }}
+        viewport={{
+          once: true,
+          amount: 0.1,
+        }}
+        transition={{
+          duration: 0.65,
+          ease: [0.22, 1, 0.36, 1],
+        }}
+      >
+        <SectionHeading
+          eyebrow="More Projects"
+          title="Other Work"
+          titleId="other-work-title"
+          className="mb-10 md:mb-14"
+        />
 
         <div className="md:hidden">
           <FeatureCarousel />
@@ -24,7 +48,7 @@ export function OtherWork() {
         <div className="hidden md:block">
           <VerticalTabs />
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 }

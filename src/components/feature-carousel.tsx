@@ -1,13 +1,20 @@
 "use client";
 
-import React, {
-  useState,
-  useEffect,
+import Image from "next/image";
+import {
+  useAnimation,
+  useReducedMotion,
+} from "motion/react";
+import {
+  motion,
+} from "motion/react";
+import {
   useCallback,
-  useLayoutEffect,
+  useEffect,
   useRef,
+  useState,
 } from "react";
-import { motion, AnimatePresence, useReducedMotion } from "motion/react";
+
 import {
   AiCloudIcon,
   CheckmarkCircle01Icon,
@@ -16,190 +23,591 @@ import {
   GlobalSearchIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { cn } from "@/lib/utils";
 
 const PROJECTS = [
   {
     id: "sol-hair",
     label: "Sol Hair Stylist",
     icon: CheckmarkCircle01Icon,
-    description: "Hair stylist website.",
-    url: "https://solhairstylist.com/",
+    desktop:
+      "/images/projects/other-work/solhair-cover.png",
+    mobile:
+      "/images/projects/other-work/solhair-mobile.jpeg",
   },
   {
     id: "new-era",
     label: "New Era",
     icon: CommandFreeIcons,
-    description: "Beauty salon & barbershop website.",
-    url: "https://salonnewera.com/",
+    desktop:
+      "/images/projects/other-work/newera-cover.png",
+    mobile:
+      "/images/projects/other-work/newera-mobile.jpeg",
   },
   {
     id: "henry",
     label: "Henry Junk Removal",
     icon: GlobalSearchIcon,
-    description: "Junk removal business website.",
-    url: "https://hcjunkremovalny.com/",
+    desktop:
+      "/images/projects/other-work/henry-cover.png",
+    mobile:
+      "/images/projects/other-work/henry-mobile.jpeg",
   },
   {
     id: "agenda",
     label: "Agenda Clases",
     icon: DashboardSquare01Icon,
-    description: "SaaS / appointment management.",
-    url: "",
+    desktop:
+      "/images/projects/other-work/agendaclases-cover.png",
+    mobile: null,
   },
   {
     id: "artcut",
     label: "ArtCut",
     icon: AiCloudIcon,
-    description: "Salon website.",
-    url: "https://www.artcutsalon.com/",
+    desktop:
+      "/images/projects/other-work/artcut-cover.png",
+    mobile:
+      "/images/projects/other-work/artcut-mobile.png",
   },
 ];
 
-const AUTO_PLAY_INTERVAL = 3600;
-const ITEM_HEIGHT = 58;
+const AUTO_PLAY_INTERVAL = 4200;
 
-function shortestOffset(index: number, current: number, len: number) {
-  let d = ((index - current) % len + len) % len;
-  if (d > len / 2) d -= len;
-  return d;
+const SLIDE_TRANSITION = {
+  duration: 0.42,
+  ease: [0.22, 1, 0.36, 1] as const,
+};
+
+type Direction = -1 | 1;
+
+function wrapIndex(
+  index: number,
+  length: number,
+) {
+  return (
+    (index % length + length) %
+    length
+  );
 }
 
-const chipSpring = {
-  type: "tween" as const,
-  duration: 0.42,
-  ease: [0.4, 0, 0.2, 1] as const,
-};
-
-const cardSpring = {
-  type: "tween" as const,
-  duration: 0.38,
-  ease: [0.4, 0, 0.2, 1] as const,
-};
-
 export default function FeatureCarousel() {
-  const [step, setStep] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
-  const reduceMotion = useReducedMotion();
+  const reduceMotion =
+    useReducedMotion();
+
+  const [currentIndex, setCurrentIndex] =
+    useState(0);
+
+  const [isPaused, setIsPaused] =
+    useState(false);
+
+  const [isAnimating, setIsAnimating] =
+    useState(false);
+
+  const cardViewportRef =
+    useRef<HTMLDivElement>(null);
+
+  const selectorViewportRef =
+    useRef<HTMLDivElement>(null);
+
+  const [cardMetrics, setCardMetrics] =
+    useState({
+      width: 0,
+      itemWidth: 0,
+      gap: 14,
+      baseX: 0,
+      step: 0,
+    });
+
+  const [
+    selectorMetrics,
+    setSelectorMetrics,
+  ] =
+    useState({
+      width: 0,
+      itemWidth: 0,
+      gap: 12,
+      baseX: 0,
+      step: 0,
+    });
+
+  const cardControls =
+    useAnimation();
+
+  const selectorControls =
+    useAnimation();
+
   const len = PROJECTS.length;
 
-  const currentIndex = ((step % len) + len) % len;
+  const previousIndex =
+    wrapIndex(
+      currentIndex - 1,
+      len,
+    );
 
-  const nextStep = useCallback(() => {
-    setStep((prev) => prev + 1);
-  }, []);
+  const nextIndex =
+    wrapIndex(
+      currentIndex + 1,
+      len,
+    );
 
-  const handleChipClick = (index: number) => {
-    const delta = shortestOffset(index, currentIndex, len);
-    if (delta !== 0) setStep((s) => s + delta);
-  };
+  const visibleProjects = [
+    PROJECTS[previousIndex]!,
+    PROJECTS[currentIndex]!,
+    PROJECTS[nextIndex]!,
+  ];
 
   useEffect(() => {
-    if (isPaused) return;
-    const interval = setInterval(nextStep, AUTO_PLAY_INTERVAL);
-    return () => clearInterval(interval);
-  }, [nextStep, isPaused]);
+    const updateMetrics = () => {
+      const cardWidth =
+        cardViewportRef.current
+          ?.clientWidth ?? 0;
 
-  const getCardStatus = (index: number) => {
-    const d = shortestOffset(index, currentIndex, len);
-    if (d === 0) return "active";
-    if (d === -1) return "prev";
-    if (d === 1) return "next";
-    return "hidden";
-  };
+      const selectorWidth =
+        selectorViewportRef.current
+          ?.clientWidth ?? 0;
+
+      if (cardWidth > 0) {
+        const gap = 14;
+        const itemWidth =
+          Math.min(
+            cardWidth * 0.86,
+            340,
+          );
+
+        const step =
+          itemWidth + gap;
+
+        const baseX =
+          (cardWidth -
+            itemWidth) /
+            2 -
+          step;
+
+        setCardMetrics({
+          width: cardWidth,
+          itemWidth,
+          gap,
+          baseX,
+          step,
+        });
+
+        cardControls.set({
+          x: baseX,
+        });
+      }
+
+      if (selectorWidth > 0) {
+        const gap = 12;
+        const itemWidth =
+          Math.min(
+            selectorWidth * 0.58,
+            205,
+          );
+
+        const step =
+          itemWidth + gap;
+
+        const baseX =
+          (selectorWidth -
+            itemWidth) /
+            2 -
+          step;
+
+        setSelectorMetrics({
+          width:
+            selectorWidth,
+          itemWidth,
+          gap,
+          baseX,
+          step,
+        });
+
+        selectorControls.set({
+          x: baseX,
+        });
+      }
+    };
+
+    updateMetrics();
+
+    const observer =
+      new ResizeObserver(
+        updateMetrics,
+      );
+
+    if (
+      cardViewportRef.current
+    ) {
+      observer.observe(
+        cardViewportRef.current,
+      );
+    }
+
+    if (
+      selectorViewportRef.current
+    ) {
+      observer.observe(
+        selectorViewportRef.current,
+      );
+    }
+
+    return () =>
+      observer.disconnect();
+  }, [
+    cardControls,
+    selectorControls,
+  ]);
+
+  const resetTracks =
+    useCallback(async () => {
+      await Promise.all([
+        cardControls.start({
+          x: cardMetrics.baseX,
+          transition:
+            reduceMotion
+              ? {
+                  duration: 0,
+                }
+              : SLIDE_TRANSITION,
+        }),
+
+        selectorControls.start({
+          x:
+            selectorMetrics.baseX,
+          transition:
+            reduceMotion
+              ? {
+                  duration: 0,
+                }
+              : SLIDE_TRANSITION,
+        }),
+      ]);
+    }, [
+      cardControls,
+      cardMetrics.baseX,
+      reduceMotion,
+      selectorControls,
+      selectorMetrics.baseX,
+    ]);
+
+  const move = useCallback(
+    async (
+      direction: Direction,
+    ) => {
+      if (
+        isAnimating ||
+        cardMetrics.step === 0 ||
+        selectorMetrics.step ===
+          0
+      ) {
+        return;
+      }
+
+      setIsAnimating(true);
+      setIsPaused(true);
+
+      const cardTarget =
+        cardMetrics.baseX -
+        direction *
+          cardMetrics.step;
+
+      const selectorTarget =
+        selectorMetrics.baseX -
+        direction *
+          selectorMetrics.step;
+
+      await Promise.all([
+        cardControls.start({
+          x: cardTarget,
+          transition:
+            reduceMotion
+              ? {
+                  duration: 0,
+                }
+              : SLIDE_TRANSITION,
+        }),
+
+        selectorControls.start({
+          x: selectorTarget,
+          transition:
+            reduceMotion
+              ? {
+                  duration: 0,
+                }
+              : SLIDE_TRANSITION,
+        }),
+      ]);
+
+      setCurrentIndex(
+        (current) =>
+          wrapIndex(
+            current +
+              direction,
+            len,
+          ),
+      );
+
+      cardControls.set({
+        x: cardMetrics.baseX,
+      });
+
+      selectorControls.set({
+        x:
+          selectorMetrics.baseX,
+      });
+
+      setIsAnimating(false);
+      setIsPaused(false);
+    },
+    [
+      cardControls,
+      cardMetrics.baseX,
+      cardMetrics.step,
+      isAnimating,
+      len,
+      reduceMotion,
+      selectorControls,
+      selectorMetrics.baseX,
+      selectorMetrics.step,
+    ],
+  );
+
+  useEffect(() => {
+    if (
+      isPaused ||
+      isAnimating
+    ) {
+      return;
+    }
+
+    const interval =
+      window.setInterval(
+        () => {
+          void move(1);
+        },
+        AUTO_PLAY_INTERVAL,
+      );
+
+    return () =>
+      window.clearInterval(
+        interval,
+      );
+  }, [
+    isAnimating,
+    isPaused,
+    move,
+  ]);
+
+  const handleDragEnd =
+    useCallback(
+      async (
+        offsetX: number,
+        velocityX: number,
+      ) => {
+        const distance = 42;
+        const velocity = 260;
+
+        if (
+          offsetX <
+            -distance ||
+          velocityX <
+            -velocity
+        ) {
+          await move(1);
+          return;
+        }
+
+        if (
+          offsetX >
+            distance ||
+          velocityX >
+            velocity
+        ) {
+          await move(-1);
+          return;
+        }
+
+        await resetTracks();
+        setIsPaused(false);
+      },
+      [
+        move,
+        resetTracks,
+      ],
+    );
 
   return (
-    <div className="@container mx-auto w-full">
-      <div className="relative flex min-h-[610px] flex-col overflow-hidden rounded-[2rem] border border-border/40">
-        <div className="relative z-30 h-[205px] w-full shrink-0 overflow-hidden bg-foreground px-5">
-          <div className="pointer-events-none absolute inset-x-0 top-0 z-40 h-9 bg-gradient-to-b from-foreground via-foreground/85 to-transparent" />
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-40 h-9 bg-gradient-to-t from-foreground via-foreground/85 to-transparent" />
+    <div className="mx-auto w-full">
+      <div className="relative overflow-hidden rounded-[2rem] border border-border/50 bg-surface-1">
+        {/* SELECTOR */}
+        <div
+          ref={
+            selectorViewportRef
+          }
+          className="relative overflow-hidden border-b border-border/50 bg-[radial-gradient(circle_at_50%_0%,rgba(123,140,255,0.10),transparent_46%),#121214] py-6"
+        >
+          <motion.div
+            drag="x"
+            dragMomentum={false}
+            animate={
+              selectorControls
+            }
+            onDragStart={() => {
+              setIsPaused(true);
+            }}
+            onDragEnd={(
+              _,
+              info,
+            ) => {
+              void handleDragEnd(
+                info.offset.x,
+                info.velocity.x,
+              );
+            }}
+            className="flex cursor-grab touch-pan-y items-center active:cursor-grabbing"
+            style={{
+              gap:
+                selectorMetrics.gap,
+              willChange:
+                "transform",
+            }}
+          >
+            {visibleProjects.map(
+              (
+                project,
+                index,
+              ) => {
+                const active =
+                  index === 1;
 
-          <div className="relative z-20 flex h-full w-full items-center justify-center">
-            {PROJECTS.map((project, index) => (
-              <FeatureChip
-                key={project.id}
-                project={project}
-                index={index}
-                currentIndex={currentIndex}
-                total={len}
-                reduceMotion={!!reduceMotion}
-                onSelect={() => handleChipClick(index)}
-                onPause={() => setIsPaused(true)}
-                onResume={() => setIsPaused(false)}
-              />
-            ))}
-          </div>
+                return (
+                  <button
+                    key={`${project.id}-${currentIndex}-${index}`}
+                    type="button"
+                    onClick={() => {
+                      if (
+                        index ===
+                        0
+                      ) {
+                        void move(
+                          -1,
+                        );
+                      }
+
+                      if (
+                        index ===
+                        2
+                      ) {
+                        void move(
+                          1,
+                        );
+                      }
+                    }}
+                    className={[
+                      "flex shrink-0 items-center justify-center gap-2.5 rounded-full border px-4 transition-[opacity,background-color,border-color] duration-200",
+                      active
+                        ? "min-h-11 border-brand-soft/25 bg-foreground text-background"
+                        : "min-h-10 border-border bg-surface-2 text-foreground-muted opacity-75",
+                    ].join(
+                      " ",
+                    )}
+                    style={{
+                      width:
+                        selectorMetrics.itemWidth,
+                    }}
+                  >
+                    <HugeiconsIcon
+                      icon={
+                        project.icon
+                      }
+                      size={
+                        active
+                          ? 16
+                          : 14
+                      }
+                      strokeWidth={
+                        active
+                          ? 2
+                          : 1.8
+                      }
+                    />
+
+                    <span
+                      className={[
+                        "truncate whitespace-nowrap uppercase",
+                        active
+                          ? "text-[0.68rem] font-semibold tracking-[0.1em]"
+                          : "text-[0.6rem] font-medium tracking-[0.08em]",
+                      ].join(
+                        " ",
+                      )}
+                    >
+                      {
+                        project.label
+                      }
+                    </span>
+                  </button>
+                );
+              },
+            )}
+          </motion.div>
         </div>
 
-        <div className="relative flex min-h-[405px] flex-1 items-center justify-center overflow-hidden border-t border-border/20 bg-secondary/20 px-5 py-8">
-          <div className="relative flex aspect-[4/5] w-full max-w-[360px] items-center justify-center">
-            {PROJECTS.map((project, index) => {
-              const status = getCardStatus(index);
-              const isActive = status === "active";
-              const isPrev = status === "prev";
-              const isNext = status === "next";
-
-              return (
-                <motion.div
-                  key={project.id}
-                  initial={false}
-                  animate={{
-                    x: isActive ? 0 : isPrev ? -62 : isNext ? 62 : 0,
-                    scale: isActive ? 1 : isPrev || isNext ? 0.88 : 0.72,
-                    opacity: isActive ? 1 : isPrev || isNext ? 0.34 : 0,
-                    rotate: isPrev ? -2.5 : isNext ? 2.5 : 0,
-                    zIndex: isActive ? 20 : isPrev || isNext ? 10 : 0,
-                    pointerEvents: isActive ? "auto" : "none",
-                  }}
-                  transition={reduceMotion ? { duration: 0 } : cardSpring}
-                  className="absolute inset-0 origin-center overflow-hidden rounded-[1.8rem] border border-border/60 bg-background shadow-2xl"
-                >
-                  <ProjectPreview />
-
-                  <AnimatePresence initial={false}>
-                    {isActive && (
-                      <motion.div
-                        initial={reduceMotion ? false : { opacity: 0, y: 12 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 8 }}
-                        transition={
-                          reduceMotion
-                            ? { duration: 0 }
-                            : { duration: 0.2, ease: [0.32, 0.72, 0, 1] }
-                        }
-                        className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/75 to-transparent p-6 pt-24 text-white"
-                      >
-                        <p className="text-[10px] uppercase tracking-[0.2em] text-white/60">
-                          0{index + 1}
-                        </p>
-                        <h3 className="mt-1 text-2xl font-medium tracking-tight">
-                          {project.label}
-                        </h3>
-                        <p className="mt-2 text-sm text-white/70">
-                          {project.description}
-                        </p>
-
-                        {project.url ? (
-                          <a
-                            href={project.url}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="mt-5 inline-flex rounded-full border border-white/25 bg-white/10 px-4 py-2 text-xs uppercase tracking-[0.15em] transition hover:bg-white hover:text-black"
-                          >
-                            Visit ↗
-                          </a>
-                        ) : (
-                          <span className="mt-5 inline-flex rounded-full border border-white/15 px-4 py-2 text-xs uppercase tracking-[0.15em] text-white/45">
-                            In development
-                          </span>
-                        )}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </motion.div>
-              );
-            })}
+        {/* PROJECTS */}
+        <div className="relative bg-background py-8">
+          <div
+            ref={
+              cardViewportRef
+            }
+            className="relative h-[430px] overflow-hidden"
+          >
+            <motion.div
+              drag="x"
+              dragMomentum={false}
+              animate={
+                cardControls
+              }
+              onDragStart={() => {
+                setIsPaused(true);
+              }}
+              onDragEnd={(
+                _,
+                info,
+              ) => {
+                void handleDragEnd(
+                  info.offset.x,
+                  info.velocity.x,
+                );
+              }}
+              className="flex h-full cursor-grab touch-pan-y items-stretch active:cursor-grabbing"
+              style={{
+                gap:
+                  cardMetrics.gap,
+                willChange:
+                  "transform",
+              }}
+            >
+              {visibleProjects.map(
+                (
+                  project,
+                  index,
+                ) => (
+                  <ProjectCard
+                    key={`${project.id}-${currentIndex}-${index}`}
+                    project={
+                      project
+                    }
+                    active={
+                      index ===
+                      1
+                    }
+                    width={
+                      cardMetrics.itemWidth
+                    }
+                  />
+                ),
+              )}
+            </motion.div>
           </div>
         </div>
       </div>
@@ -207,89 +615,73 @@ export default function FeatureCarousel() {
   );
 }
 
-function ProjectPreview() {
-  return (
-    <div className="absolute inset-0 overflow-hidden bg-[#b91c1c]">
-      <div className="absolute left-[8%] right-[8%] top-[9%] h-[44%] rounded-xl border border-white/25 bg-[#ef4444] shadow-2xl" />
-      <div className="absolute bottom-[18%] right-[9%] h-[49%] w-[28%] rounded-[1.2rem] border-[3px] border-white/45 bg-[#dc2626] shadow-2xl" />
-      <div className="absolute left-[10%] top-[12%] h-2 w-20 rounded-full bg-white/20" />
-      <div className="absolute left-[10%] top-[17%] h-2 w-12 rounded-full bg-white/15" />
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/35" />
-    </div>
-  );
-}
-
-function FeatureChip({
+function ProjectCard({
   project,
-  index,
-  currentIndex,
-  total,
-  reduceMotion,
-  onSelect,
-  onPause,
-  onResume,
+  active,
+  width,
 }: {
-  project: (typeof PROJECTS)[number];
-  index: number;
-  currentIndex: number;
-  total: number;
-  reduceMotion: boolean;
-  onSelect: () => void;
-  onPause: () => void;
-  onResume: () => void;
+  project:
+    (typeof PROJECTS)[number];
+  active: boolean;
+  width: number;
 }) {
-  const offset = shortestOffset(index, currentIndex, total);
-  const prevOffset = useRef(offset);
-  const jumped = Math.abs(offset - prevOffset.current) > 1;
-
-  useLayoutEffect(() => {
-    prevOffset.current = offset;
-  }, [offset]);
-
-  const isActive = offset === 0;
-
   return (
-    <motion.div
-      initial={false}
-      style={{ height: ITEM_HEIGHT, width: "fit-content" }}
-      animate={{
-        y: offset * ITEM_HEIGHT,
-        opacity: Math.max(0, 1 - Math.abs(offset) * 0.28),
+    <article
+      className={[
+        "relative h-full shrink-0 overflow-hidden rounded-[1.8rem] border bg-surface-1 transition-[opacity,transform] duration-300",
+        active
+          ? "border-border/70 opacity-100"
+          : "border-border/40 opacity-45 scale-[0.96]",
+      ].join(" ")}
+      style={{
+        width,
       }}
-      transition={
-        reduceMotion
-          ? { duration: 0 }
-          : jumped
-            ? { duration: 0 }
-            : chipSpring
-      }
-      className="absolute flex items-center justify-start"
     >
-      <button
-        type="button"
-        onClick={onSelect}
-        onMouseEnter={onPause}
-        onMouseLeave={onResume}
-        className={cn(
-          "relative flex cursor-pointer items-center gap-3 rounded-full border px-5 py-3 text-left transition-[color,background-color,border-color] duration-150 ease-out active:scale-[0.97]",
-          isActive
-            ? "z-10 border-background bg-background text-foreground"
-            : "border-background/15 bg-transparent text-background/50"
-        )}
-      >
-        <div
-          className={cn(
-            "flex items-center justify-center",
-            isActive ? "text-foreground" : "text-background/35"
-          )}
-        >
-          <HugeiconsIcon icon={project.icon} size={17} strokeWidth={2} />
-        </div>
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_10%,rgba(123,140,255,0.08),transparent_35%),#0d0d0f]" />
 
-        <span className="whitespace-nowrap text-xs font-medium uppercase tracking-[0.12em]">
+      <div
+        className="absolute left-[7%] right-[7%] top-[8%] overflow-hidden rounded-xl border border-white/10 bg-black"
+        style={{
+          aspectRatio:
+            "1.986 / 1",
+        }}
+      >
+        <Image
+          src={
+            project.desktop
+          }
+          alt={`${project.label} desktop`}
+          fill
+          sizes="(max-width: 767px) 76vw, 340px"
+          className="object-cover object-top"
+        />
+      </div>
+
+      {project.mobile && (
+        <div
+          className="absolute bottom-[18%] right-[8%] w-[27%] overflow-hidden rounded-[1.15rem] border-[3px] border-[#343840] bg-black shadow-[0_12px_26px_rgba(0,0,0,0.38)]"
+          style={{
+            aspectRatio:
+              "0.45 / 1",
+          }}
+        >
+          <Image
+            src={
+              project.mobile
+            }
+            alt={`${project.label} mobile`}
+            fill
+            sizes="90px"
+            className="object-cover object-top"
+          />
+        </div>
+      )}
+
+      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/72 to-transparent p-6 pt-24">
+        <h3 className="text-2xl font-medium tracking-tight text-white">
           {project.label}
-        </span>
-      </button>
-    </motion.div>
+        </h3>
+      </div>
+    </article>
   );
 }

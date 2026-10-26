@@ -6,53 +6,37 @@ import FluidCursor from "@/components/effects/FluidCursor";
 import { GlobalLight } from "@/components/effects/GlobalLight";
 import { globalPerformanceState } from "@/components/effects/global-performance-state";
 
-const MOBILE_EFFECTS_FADE_RATIO = 0.66;
-const MOBILE_EFFECTS_RESUME_RATIO = 0.78;
-const FLUID_FADE_DURATION_MS = 700;
+const EFFECTS_FADE_DURATION_MS = 850;
+const RESUME_GAP_PX = 48;
 
 export function GlobalEffects() {
-  const [isMobile, setIsMobile] =
-    useState(false);
+  const [effectsMounted, setEffectsMounted] =
+    useState(true);
 
-  const [mobileEffectsSuspended, setMobileEffectsSuspended] =
-    useState(false);
-
-  const [fluidFadedOut, setFluidFadedOut] =
-    useState(false);
-
-  const [fluidHidden, setFluidHidden] =
+  const [effectsFadedOut, setEffectsFadedOut] =
     useState(false);
 
   const suspendedRef =
     useRef(false);
 
-  const fluidFadeTimerRef =
+  const fadeTimerRef =
     useRef<number | null>(null);
 
   const frameRef =
     useRef<number | null>(null);
 
   useEffect(() => {
-    const mobileQuery =
-      window.matchMedia(
-        "(max-width: 767px)",
-      );
-
-    const clearFluidFadeTimer = () => {
-      if (
-        fluidFadeTimerRef.current !==
-        null
-      ) {
+    const clearFadeTimer = () => {
+      if (fadeTimerRef.current !== null) {
         window.clearTimeout(
-          fluidFadeTimerRef.current,
+          fadeTimerRef.current,
         );
 
-        fluidFadeTimerRef.current =
-          null;
+        fadeTimerRef.current = null;
       }
     };
 
-    const suspendMobileEffects = () => {
+    const suspendEffects = () => {
       if (suspendedRef.current) {
         return;
       }
@@ -60,179 +44,135 @@ export function GlobalEffects() {
       suspendedRef.current = true;
 
       /*
-       * GlobalLight deja de consumir GPU en cuanto
-       * entramos en el tramo de transición hacia
-       * Selected Work.
+       * Primero desaparece visualmente todo el bloque.
+       * Los efectos todavía siguen vivos durante el fade,
+       * así que no hay flash ni corte brusco.
        */
-      setMobileEffectsSuspended(true);
+      setEffectsFadedOut(true);
 
-      /*
-       * El fluido NO desaparece de golpe.
-       * Primero dejamos que su último movimiento siga
-       * vivo mientras el canvas se desvanece.
-       */
-      setFluidHidden(false);
-      setFluidFadedOut(true);
+      clearFadeTimer();
 
-      clearFluidFadeTimer();
-
-      fluidFadeTimerRef.current =
+      fadeTimerRef.current =
         window.setTimeout(() => {
           /*
-           * Recién cuando ya terminó el fade detenemos
-           * la simulación WebGL. El canvas queda oculto,
-           * pero conserva su último frame para poder
-           * reanudarse al volver al Hero.
+           * Recién cuando el fade terminó:
+           * - detenemos FluidCursor;
+           * - desmontamos los efectos pesados.
            */
           globalPerformanceState.isScrolling =
             true;
 
-          setFluidHidden(true);
+          setEffectsMounted(false);
 
-          fluidFadeTimerRef.current =
-            null;
-        }, FLUID_FADE_DURATION_MS);
+          fadeTimerRef.current = null;
+        }, EFFECTS_FADE_DURATION_MS);
     };
 
-    const resumeMobileEffects = () => {
+    const resumeEffects = () => {
       if (!suspendedRef.current) {
         return;
       }
 
       suspendedRef.current = false;
 
-      clearFluidFadeTimer();
+      clearFadeTimer();
 
       /*
-       * Reactivamos primero la simulación y hacemos
-       * visible el canvas todavía en opacity 0.
+       * Reactivamos primero mientras todavía está
+       * invisible y después hacemos el fade-in.
        */
       globalPerformanceState.isScrolling =
         false;
 
-      setFluidHidden(false);
-      setMobileEffectsSuspended(false);
+      setEffectsMounted(true);
 
-      /*
-       * En el siguiente frame iniciamos el fade-in.
-       * Así evitamos que el canvas reaparezca de golpe.
-       */
       window.requestAnimationFrame(() => {
-        setFluidFadedOut(false);
+        window.requestAnimationFrame(() => {
+          setEffectsFadedOut(false);
+        });
       });
     };
 
-    const resetDesktopEffects = () => {
-      suspendedRef.current = false;
-
-      clearFluidFadeTimer();
-
-      globalPerformanceState.isScrolling =
-        false;
-
-      setMobileEffectsSuspended(false);
-      setFluidHidden(false);
-      setFluidFadedOut(false);
-    };
-
-    const updatePerformanceMode = () => {
+    const updateEffectsState = () => {
       frameRef.current = null;
 
-      const mobile =
-        mobileQuery.matches;
+      const scene =
+        document.querySelector<HTMLElement>(
+          "#work .project-sticky-scene",
+        );
 
-      globalPerformanceState.isMobile =
-        mobile;
-
-      setIsMobile((current) =>
-        current === mobile
-          ? current
-          : mobile,
-      );
-
-      if (!mobile) {
-        resetDesktopEffects();
+      if (!scene) {
+        resumeEffects();
         return;
       }
 
-      const selected =
-        document.getElementById("work");
-
-      if (!selected) {
-        resumeMobileEffects();
-        return;
-      }
-
-      const viewportHeight =
-        window.innerHeight;
-
-      if (viewportHeight <= 0) {
-        return;
-      }
-
-      const selectedTop =
-        selected.getBoundingClientRect().top;
-
-      const topRatio =
-        selectedTop / viewportHeight;
+      const sceneRect =
+        scene.getBoundingClientRect();
 
       /*
-       * Hysteresis:
-       *
-       * - Al bajar, iniciamos el fade en la última parte
-       *   de la transición Hero -> Selected Work.
-       * - Al volver hacia arriba, reanudamos recién cuando
-       *   el Hero vuelve a tener espacio suficiente.
+       * Leemos el top REAL del sticky desde CSS
+       * (`--project-scene-top` termina resolviendo en 2rem).
+       * No usamos porcentajes arbitrarios del viewport.
        */
+      const stickyTop =
+        Number.parseFloat(
+          window.getComputedStyle(scene).top,
+        ) || 0;
+
+      /*
+       * Cuando la escena llega a su posición sticky,
+       * el título ya quedó arriba y comienza el tramo
+       * donde entra la primera card.
+       */
+      const reachedStickyPoint =
+        sceneRect.top <= stickyTop + 1;
+
+      /*
+       * Hysteresis simple para que al subir no esté
+       * prendiendo/apagando alrededor del mismo píxel.
+       */
+      const leftStickyPoint =
+        sceneRect.top >
+        stickyTop + RESUME_GAP_PX;
+
       if (
         !suspendedRef.current &&
-        topRatio <=
-          MOBILE_EFFECTS_FADE_RATIO
+        reachedStickyPoint
       ) {
-        suspendMobileEffects();
+        suspendEffects();
         return;
       }
 
       if (
         suspendedRef.current &&
-        topRatio >=
-          MOBILE_EFFECTS_RESUME_RATIO
+        leftStickyPoint
       ) {
-        resumeMobileEffects();
+        resumeEffects();
       }
     };
 
-    const schedulePerformanceUpdate =
-      () => {
-        if (
-          frameRef.current !== null
-        ) {
-          return;
-        }
+    const scheduleUpdate = () => {
+      if (frameRef.current !== null) {
+        return;
+      }
 
-        frameRef.current =
-          window.requestAnimationFrame(
-            updatePerformanceMode,
-          );
-      };
+      frameRef.current =
+        window.requestAnimationFrame(
+          updateEffectsState,
+        );
+    };
 
-    const handleVisibilityChange =
-      () => {
-        globalPerformanceState.isDocumentVisible =
-          !document.hidden;
-      };
+    const handleVisibilityChange = () => {
+      globalPerformanceState.isDocumentVisible =
+        !document.hidden;
+    };
 
     handleVisibilityChange();
-    updatePerformanceMode();
-
-    mobileQuery.addEventListener(
-      "change",
-      schedulePerformanceUpdate,
-    );
+    updateEffectsState();
 
     window.addEventListener(
       "scroll",
-      schedulePerformanceUpdate,
+      scheduleUpdate,
       {
         passive: true,
       },
@@ -240,7 +180,7 @@ export function GlobalEffects() {
 
     window.addEventListener(
       "resize",
-      schedulePerformanceUpdate,
+      scheduleUpdate,
     );
 
     document.addEventListener(
@@ -249,19 +189,14 @@ export function GlobalEffects() {
     );
 
     return () => {
-      mobileQuery.removeEventListener(
-        "change",
-        schedulePerformanceUpdate,
-      );
-
       window.removeEventListener(
         "scroll",
-        schedulePerformanceUpdate,
+        scheduleUpdate,
       );
 
       window.removeEventListener(
         "resize",
-        schedulePerformanceUpdate,
+        scheduleUpdate,
       );
 
       document.removeEventListener(
@@ -269,11 +204,9 @@ export function GlobalEffects() {
         handleVisibilityChange,
       );
 
-      clearFluidFadeTimer();
+      clearFadeTimer();
 
-      if (
-        frameRef.current !== null
-      ) {
+      if (frameRef.current !== null) {
         window.cancelAnimationFrame(
           frameRef.current,
         );
@@ -284,30 +217,32 @@ export function GlobalEffects() {
     };
   }, []);
 
-  const suspendHeavyMobileEffects =
-    isMobile &&
-    mobileEffectsSuspended;
-
   return (
-    <>
-      {!
-        suspendHeavyMobileEffects && (
-        <GlobalLight />
-      )}
-
-      <FluidCursor
-        opacity={
-          isMobile && fluidFadedOut
+    <div
+      className="absolute inset-0"
+      style={{
+        opacity:
+          effectsFadedOut
             ? 0
-            : 1
-        }
-        hidden={
-          isMobile && fluidHidden
-        }
-        fadeDurationMs={
-          FLUID_FADE_DURATION_MS
-        }
-      />
-    </>
+            : 1,
+
+        transition:
+          `opacity ${EFFECTS_FADE_DURATION_MS}ms ease`,
+      }}
+    >
+      {effectsMounted && (
+        <>
+          <GlobalLight />
+
+          <FluidCursor
+            opacity={1}
+            hidden={false}
+            fadeDurationMs={
+              EFFECTS_FADE_DURATION_MS
+            }
+          />
+        </>
+      )}
+    </div>
   );
 }

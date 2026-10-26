@@ -13,21 +13,6 @@ export default function Home() {
     <>
       <div className="pointer-events-none fixed left-0 top-0 z-[1] h-[100lvh] w-screen">
         <GlobalEffects />
-
-        <div
-          className="absolute inset-0"
-          style={{
-            background: `
-              linear-gradient(
-                90deg,
-                color-mix(in srgb, var(--background) 96%, transparent) 0%,
-                color-mix(in srgb, var(--background) 86%, transparent) 32%,
-                color-mix(in srgb, var(--background) 42%, transparent) 58%,
-                transparent 82%
-              )
-            `,
-          }}
-        />
       </div>
 
       <Hero />
