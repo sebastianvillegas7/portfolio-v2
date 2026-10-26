@@ -2,9 +2,9 @@
 
 import { motion } from "motion/react";
 
-import FeatureCarousel from "@/components/feature-carousel";
 import VerticalTabs from "@/components/vertical-tabs";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { otherProjects } from "@/data/projects";
 
 export function OtherWork() {
   return (
@@ -13,8 +13,7 @@ export function OtherWork() {
       className="section"
       aria-labelledby="other-work-title"
       style={{
-        paddingTop:
-          "calc(var(--section-space-y) + 3rem)",
+        paddingTop: "calc(var(--section-space-y) + 3rem)",
       }}
     >
       <motion.div
@@ -41,13 +40,7 @@ export function OtherWork() {
           className="mb-10 md:mb-14"
         />
 
-        <div className="md:hidden">
-          <FeatureCarousel />
-        </div>
-
-        <div className="hidden md:block">
-          <VerticalTabs />
-        </div>
+        <VerticalTabs projects={otherProjects} />
       </motion.div>
     </section>
   );
