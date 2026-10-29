@@ -2,7 +2,7 @@ import Image from "next/image";
 
 type ProjectDevicePreviewProps = {
   desktopSrc: string;
-  mobileSrc: string;
+  mobileSrc?: string;
   title: string;
   priority?: boolean;
 };
@@ -43,23 +43,25 @@ export function ProjectDevicePreview({
         />
       </div>
 
-      <div className="project-phone">
-        <div
-          className="project-phone-speaker"
-          aria-hidden="true"
-        />
-
-        <div className="project-phone-screen">
-          <Image
-            src={mobileSrc}
-            alt={`${title} en mobile`}
-            fill
-            priority={priority}
-            sizes="(max-width: 767px) 25vw, 17vw"
-            className="project-device-image"
+      {mobileSrc && (
+        <div className="project-phone">
+          <div
+            className="project-phone-speaker"
+            aria-hidden="true"
           />
+
+          <div className="project-phone-screen">
+            <Image
+              src={mobileSrc}
+              alt={`${title} en mobile`}
+              fill
+              priority={priority}
+              sizes="(max-width: 767px) 25vw, 17vw"
+              className="project-device-image"
+            />
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

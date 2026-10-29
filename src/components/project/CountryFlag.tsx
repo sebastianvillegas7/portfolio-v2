@@ -7,7 +7,6 @@ type CountryFlagProps = {
 
 export function CountryFlag({
   code,
-  country,
 }: CountryFlagProps) {
   return (
     <Image

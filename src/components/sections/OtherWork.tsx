@@ -12,9 +12,6 @@ export function OtherWork() {
       id="OtherWork"
       className="section"
       aria-labelledby="other-work-title"
-      style={{
-        paddingTop: "calc(var(--section-space-y) + 3rem)",
-      }}
     >
       <motion.div
         className="page-container"

@@ -1,0 +1,10 @@
+/* =========================================================
+   OTHER WORK
+   Section-level layout only.
+   Component-specific responsive styles stay with the component
+   until the desktop/tablet pass is finalized.
+   ========================================================= */
+
+#OtherWork {
+  padding-top: calc(var(--section-space-y) + 3rem);
+}

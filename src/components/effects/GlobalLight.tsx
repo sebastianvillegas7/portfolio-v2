@@ -1,6 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 import { LightRays } from "@/components/effects/LightRays";
 
@@ -171,7 +176,7 @@ export function GlobalLight() {
 
   const animationRef =
     useRef<number | null>(null);
-  
+
   const lastReactUpdateRef =
     useRef(0);
 
@@ -182,28 +187,31 @@ export function GlobalLight() {
    * Actualiza React y mantiene una copia exacta
    * del estado visual actual.
    */
-  const updateLight = (
-    value: LightState,
-    force = false,
-  ) => {
-    currentLightRef.current = value;
+  const updateLight = useCallback(
+    (
+      value: LightState,
+      force = false,
+    ) => {
+      currentLightRef.current = value;
 
-    const now = performance.now();
+      const now = performance.now();
 
-    if (
-      !force &&
-      isMobileRef.current &&
-      now - lastReactUpdateRef.current < 33
-    ) {
-      return;
-    }
+      if (
+        !force &&
+        isMobileRef.current &&
+        now - lastReactUpdateRef.current < 33
+      ) {
+        return;
+      }
 
-    lastReactUpdateRef.current = now;
+      lastReactUpdateRef.current = now;
 
-    setLight(value);
-  };
+      setLight(value);
+    },
+    [],
+  );
 
-  const stopAnimation = () => {
+  const stopAnimation = useCallback(() => {
     if (
       animationRef.current !== null
     ) {
@@ -213,7 +221,7 @@ export function GlobalLight() {
 
       animationRef.current = null;
     }
-  };
+  }, []);
 
   /*
    * HERO -> SELECTED
@@ -233,126 +241,127 @@ export function GlobalLight() {
    * 8.3 - 10 s
    * Fade out final.
    */
-  const playSelectedAnimation = () => {
-    stopAnimation();
+  const playSelectedAnimation =
+    useCallback(() => {
+      stopAnimation();
 
-    const startTime =
-      performance.now();
+      const startTime =
+        performance.now();
 
-    const initial =
-      currentLightRef.current;
+      const initial =
+        currentLightRef.current;
 
-    const heroHidden: LightState = {
-      ...initial,
-      intensity: 0,
-      pointerInfluence: 0,
-    };
+      const heroHidden: LightState = {
+        ...initial,
+        intensity: 0,
+        pointerInfluence: 0,
+      };
 
-    const selectedHidden: LightState = {
-      ...SELECTED_START,
-      intensity: 0,
-    };
+      const selectedHidden: LightState = {
+        ...SELECTED_START,
+        intensity: 0,
+      };
 
-    const selectedEndVisible: LightState = {
-      ...SELECTED_END,
-    };
+      const selectedEndVisible: LightState = {
+        ...SELECTED_END,
+      };
 
-    const selectedEndHidden: LightState = {
-      ...SELECTED_END,
-      intensity: 0,
-    };
+      const selectedEndHidden: LightState = {
+        ...SELECTED_END,
+        intensity: 0,
+      };
 
-    const animate = (
-      now: number,
-    ) => {
-      const elapsed =
-        (now - startTime) / 1000;
+      const animate = (
+        now: number,
+      ) => {
+        const elapsed =
+          (now - startTime) / 1000;
 
-      let next: LightState;
+        let next: LightState;
 
-      /*
-       * Fade out del Hero.
-       */
-      if (elapsed < 1.1) {
-        next = interpolateLight(
-          initial,
-          heroHidden,
-          elapsed / 1.1,
-        );
-      }
+        /*
+         * Fade out del Hero.
+         */
+        if (elapsed < 1.1) {
+          next = interpolateLight(
+            initial,
+            heroHidden,
+            elapsed / 1.1,
+          );
+        }
 
-      /*
-       * Movimiento invisible hacia
-       * la posición de Selected.
-       */
-      else if (elapsed < 2.1) {
-        next = interpolateLight(
-          heroHidden,
-          selectedHidden,
-          (elapsed - 1.1) / 1,
-        );
-      }
+        /*
+         * Movimiento invisible hacia
+         * la posición de Selected.
+         */
+        else if (elapsed < 2.1) {
+          next = interpolateLight(
+            heroHidden,
+            selectedHidden,
+            (elapsed - 1.1) / 1,
+          );
+        }
 
-      /*
-       * Fade in Selected.
-       */
-      else if (elapsed < 3.3) {
-        next = interpolateLight(
-          selectedHidden,
-          SELECTED_START,
-          (elapsed - 2.1) / 1.2,
-        );
-      }
+        /*
+         * Fade in Selected.
+         */
+        else if (elapsed < 3.3) {
+          next = interpolateLight(
+            selectedHidden,
+            SELECTED_START,
+            (elapsed - 2.1) / 1.2,
+          );
+        }
 
-      /*
-       * Paneo grande, lento y continuo.
-       */
-      else if (elapsed < 8.3) {
-        next = interpolateLight(
-          SELECTED_START,
-          selectedEndVisible,
-          (elapsed - 3.3) / 5,
-        );
-      }
+        /*
+         * Paneo grande, lento y continuo.
+         */
+        else if (elapsed < 8.3) {
+          next = interpolateLight(
+            SELECTED_START,
+            selectedEndVisible,
+            (elapsed - 3.3) / 5,
+          );
+        }
 
-      /*
-       * Fade out final.
-       */
-      else if (elapsed < 10) {
-        next = interpolateLight(
-          selectedEndVisible,
-          selectedEndHidden,
-          (elapsed - 8.3) / 1.7,
-        );
-      }
+        /*
+         * Fade out final.
+         */
+        else if (elapsed < 10) {
+          next = interpolateLight(
+            selectedEndVisible,
+            selectedEndHidden,
+            (elapsed - 8.3) / 1.7,
+          );
+        }
 
-      /*
-       * Fin.
-       */
-      else {
-        updateLight(
-          selectedEndHidden,
-          true,
-        );
+        /*
+         * Fin.
+         */
+        else {
+          updateLight(
+            selectedEndHidden,
+            true,
+          );
 
-        animationRef.current = null;
+          animationRef.current = null;
 
-        return;
-      }
+          return;
+        }
 
-      updateLight(next);
+        updateLight(next);
+
+        animationRef.current =
+          window.requestAnimationFrame(
+            animate,
+          );
+      };
 
       animationRef.current =
         window.requestAnimationFrame(
           animate,
         );
-    };
-
-    animationRef.current =
-      window.requestAnimationFrame(
-        animate,
-      );
-  };
+    }, [stopAnimation, updateLight]);
 
   /*
    * SELECTED -> HERO
@@ -363,87 +372,88 @@ export function GlobalLight() {
    * -> recolocación invisible
    * -> fade in Hero.
    */
-  const playHeroAnimation = () => {
-    stopAnimation();
+  const playHeroAnimation =
+    useCallback(() => {
+      stopAnimation();
 
-    const startTime =
-      performance.now();
+      const startTime =
+        performance.now();
 
-    const initial =
-      currentLightRef.current;
+      const initial =
+        currentLightRef.current;
 
-    const currentHidden: LightState = {
-      ...initial,
-      intensity: 0,
-      pointerInfluence: 0,
-    };
+      const currentHidden: LightState = {
+        ...initial,
+        intensity: 0,
+        pointerInfluence: 0,
+      };
 
-    const heroHidden: LightState = {
-      ...HERO_LIGHT,
-      intensity: 0,
-      pointerInfluence: 0,
-    };
+      const heroHidden: LightState = {
+        ...HERO_LIGHT,
+        intensity: 0,
+        pointerInfluence: 0,
+      };
 
-    const animate = (
-      now: number,
-    ) => {
-      const elapsed =
-        (now - startTime) / 1000;
+      const animate = (
+        now: number,
+      ) => {
+        const elapsed =
+          (now - startTime) / 1000;
 
-      let next: LightState;
+        let next: LightState;
 
-      /*
-       * Fade out desde donde esté.
-       */
-      if (elapsed < 1) {
-        next = interpolateLight(
-          initial,
-          currentHidden,
-          elapsed / 1,
-        );
-      }
+        /*
+         * Fade out desde donde esté.
+         */
+        if (elapsed < 1) {
+          next = interpolateLight(
+            initial,
+            currentHidden,
+            elapsed / 1,
+          );
+        }
 
-      /*
-       * Recolocación invisible arriba.
-       */
-      else if (elapsed < 2) {
-        next = interpolateLight(
-          currentHidden,
-          heroHidden,
-          (elapsed - 1) / 1,
-        );
-      }
+        /*
+         * Recolocación invisible arriba.
+         */
+        else if (elapsed < 2) {
+          next = interpolateLight(
+            currentHidden,
+            heroHidden,
+            (elapsed - 1) / 1,
+          );
+        }
 
-      /*
-       * Fade in suave del Hero.
-       */
-      else if (elapsed < 3.3) {
-        next = interpolateLight(
-          heroHidden,
-          HERO_LIGHT,
-          (elapsed - 2) / 1.3,
-        );
-      } else {
-        updateLight(HERO_LIGHT, true,);
+        /*
+         * Fade in suave del Hero.
+         */
+        else if (elapsed < 3.3) {
+          next = interpolateLight(
+            heroHidden,
+            HERO_LIGHT,
+            (elapsed - 2) / 1.3,
+          );
+        } else {
+          updateLight(HERO_LIGHT, true);
 
-        animationRef.current = null;
+          animationRef.current = null;
 
-        return;
-      }
+          return;
+        }
 
-      updateLight(next);
+        updateLight(next);
+
+        animationRef.current =
+          window.requestAnimationFrame(
+            animate,
+          );
+      };
 
       animationRef.current =
         window.requestAnimationFrame(
           animate,
         );
-    };
-
-    animationRef.current =
-      window.requestAnimationFrame(
-        animate,
-      );
-  };
+    }, [stopAnimation, updateLight]);
 
   useEffect(() => {
     isMobileRef.current =
@@ -527,7 +537,11 @@ export function GlobalLight() {
         updateSection,
       );
     };
-  }, []);
+  }, [
+    playHeroAnimation,
+    playSelectedAnimation,
+    stopAnimation,
+  ]);
 
   return (
     <div className="absolute inset-0">

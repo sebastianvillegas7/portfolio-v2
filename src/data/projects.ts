@@ -26,8 +26,8 @@ export const projects: Project[] = [
     cover: "/images/projects/revia-cloud-cover.webp",
 
     preview: {
-      desktop: "/images/projects/revia-cloud-cover.webp",
-      mobile: "/images/projects/revia-cloud-mobile.jpeg",
+      desktop: "/images/projects/selected-work/revia-cloud-cover.webp",
+      mobile: "/images/projects/selected-work/revia-cloud-mobile.jpeg",
     },
 
     images: [
@@ -67,8 +67,8 @@ export const projects: Project[] = [
     cover: "/images/projects/pancho-vina-cover.webp",
 
     preview: {
-      desktop: "/images/projects/pancho-vina-cover.webp",
-      mobile: "/images/projects/pancho-vina-mobile.jpeg",
+      desktop: "/images/projects/selected-work/pancho-vina-cover.webp",
+      mobile: "/images/projects/selected-work/pancho-vina-mobile.jpeg",
     },
 
     images: [
@@ -108,8 +108,8 @@ export const projects: Project[] = [
     cover: "/images/projects/tts-studio-cover.webp",
 
     preview: {
-      desktop: "/images/projects/tts-studio-cover.webp",
-      mobile: "/images/projects/tts-studio-mobile.jpeg",
+      desktop: "/images/projects/selected-work/tts-studio-cover.webp",
+      mobile: "/images/projects/selected-work/tts-studio-mobile.jpeg",
     },
 
     images: [

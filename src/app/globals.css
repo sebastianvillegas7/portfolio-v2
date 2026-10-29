@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "../styles/other-work.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -73,46 +74,6 @@
   width: 100%;
 }
 
-/* =========================================================
-   SHARED SECTION HEADING
-   ========================================================= */
-
-.section-eyebrow {
-  margin:
-    0
-    0
-    0.75rem;
-
-  font-size: 0.64rem;
-  font-weight: 500;
-  letter-spacing: 0.16em;
-
-  text-transform: uppercase;
-
-  color:
-    var(--brand-soft);
-}
-
-.section-title {
-  max-width: 9ch;
-
-  margin: 0;
-
-  font-size:
-    clamp(
-      2.5rem,
-      11vw,
-      3.2rem
-    );
-
-  font-weight: 600;
-  line-height: 0.96;
-  letter-spacing: -0.04em;
-
-  color:
-    var(--foreground);
-}
-
 .content-narrow {
   max-width: var(--content-narrow);
 }
@@ -137,32 +98,12 @@
     --page-padding-x: 3rem;
     --section-space-y: 8rem;
   }
-
-  .section-title {
-    max-width: none;
-
-    font-size:
-      clamp(
-        3.5rem,
-        7vw,
-        4.6rem
-      );
-  }
 }
 
 @media (min-width: 64rem) {
   :root {
     --page-padding-x: 4rem;
     --section-space-y: 9rem;
-  }
-
-  .section-title {
-    font-size:
-      clamp(
-        3.8rem,
-        5vw,
-        5rem
-      );
   }
 }
 
