@@ -2,7 +2,7 @@
 
 import { motion } from "motion/react";
 
-import VerticalTabs from "@/components/vertical-tabs";
+import { OtherWorkTabs } from "@/components/other-work/OtherWorkTabs";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { otherProjects } from "@/data/projects";
 
@@ -37,7 +37,7 @@ export function OtherWork() {
           className="mb-10 md:mb-14"
         />
 
-        <VerticalTabs projects={otherProjects} />
+        <OtherWorkTabs projects={otherProjects} />
       </motion.div>
     </section>
   );

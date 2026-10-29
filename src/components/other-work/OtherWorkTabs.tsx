@@ -12,13 +12,13 @@ import type { Project } from "@/types/project";
 
 const AUTO_PLAY_DURATION = 7000;
 
-type VerticalTabsProps = {
+type OtherWorkTabsProps = {
   projects: Project[];
 };
 
-export default function VerticalTabs({
+export function OtherWorkTabs({
   projects,
-}: VerticalTabsProps) {
+}: OtherWorkTabsProps) {
   const [activeIndex, setActiveIndex] =
     useState(0);
 
