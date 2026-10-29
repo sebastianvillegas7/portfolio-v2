@@ -6,32 +6,86 @@ import AnimatedGradientText from "@/components/animata/text/animated-gradient-te
 import BlurOutUp from "@/components/animata/text/blur-out-up";
 import GibberishText from "@/components/animata/text/gibberish-text";
 import PerCharacterRise from "@/components/animata/text/per-character-rise";
+import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
+import { useLanguage } from "@/i18n/LanguageProvider";
 
 import "@/styles/hero.css";
 
-const ROLES = [
-  "Desarrollo web",
-  "Aplicaciones a medida",
-  "Full-stack development",
-  "Clases de programación",
-  "Tutorías de proyectos",
-];
-
-const HEADLINE_PREFIX = "De una idea a un producto digital que";
-const HEADLINE_HIGHLIGHT = "realmente funciona.";
-
 const HEADLINE_GRADIENT_DELAY = 4300;
 
-export function Hero() {
-  const [showHeadlineGradient, setShowHeadlineGradient] = useState(false);
+type HeroHeadlineProps = {
+  prefix: string;
+  highlight: string;
+};
+
+function HeroHeadline({
+  prefix,
+  highlight,
+}: HeroHeadlineProps) {
+  const [showHeadlineGradient, setShowHeadlineGradient] =
+    useState(false);
 
   useEffect(() => {
-    const timeout = window.setTimeout(() => {
-      setShowHeadlineGradient(true);
-    }, HEADLINE_GRADIENT_DELAY);
+    const timeout =
+      window.setTimeout(() => {
+        setShowHeadlineGradient(true);
+      }, HEADLINE_GRADIENT_DELAY);
 
-    return () => window.clearTimeout(timeout);
+    return () =>
+      window.clearTimeout(timeout);
   }, []);
+
+  return (
+    <h1
+      id="hero-title"
+      className="hero-title"
+    >
+      <PerCharacterRise
+        text={prefix}
+        characterDelayMs={62}
+        durationMs={820}
+        yPx={24}
+      />{" "}
+
+      <span className="hero-title-gradient-wrapper">
+        <span
+          className={`hero-title-base ${
+            showHeadlineGradient
+              ? "is-hidden"
+              : ""
+          }`}
+        >
+          <PerCharacterRise
+            text={highlight}
+            characterDelayMs={62}
+            durationMs={820}
+            initialDelayMs={2100}
+            yPx={24}
+          />
+        </span>
+
+        <span
+          aria-hidden="true"
+          className={`hero-title-gradient ${
+            showHeadlineGradient
+              ? "is-visible"
+              : "is-hidden"
+          }`}
+        >
+          <AnimatedGradientText className="hero-gradient-text">
+            {highlight}
+          </AnimatedGradientText>
+        </span>
+      </span>
+    </h1>
+  );
+}
+
+export function Hero() {
+  const {
+    language,
+    t,
+  } = useLanguage();
 
   return (
     <section
@@ -39,8 +93,9 @@ export function Hero() {
       className="hero"
       aria-labelledby="hero-title"
     >
-
       <div className="hero-container">
+        <LanguageSwitcher />
+
         <div className="hero-topbar hero-reveal">
           <div className="hero-name">
             <GibberishText
@@ -52,7 +107,8 @@ export function Hero() {
 
           <div className="hero-roles">
             <BlurOutUp
-              text={ROLES}
+              key={language}
+              text={[...t.hero.roles]}
               holdMs={2400}
               gapMs={180}
               speed={1}
@@ -67,58 +123,23 @@ export function Hero() {
           <div className="hero-content">
             <div className="hero-badge-wrapper">
               <span className="hero-badge">
-                Productos digitales a medida
+                {t.hero.badge}
               </span>
             </div>
 
-            <h1
-              id="hero-title"
-              className="hero-title"
-            >
-              <PerCharacterRise
-                text={HEADLINE_PREFIX}
-                characterDelayMs={62}
-                durationMs={820}
-                yPx={24}
-              />{" "}
-
-              <span className="hero-title-gradient-wrapper">
-                <span
-                  className={`hero-title-base ${
-                    showHeadlineGradient ? "is-hidden" : ""
-                  }`}
-                >
-                  <PerCharacterRise
-                    text={HEADLINE_HIGHLIGHT}
-                    characterDelayMs={62}
-                    durationMs={820}
-                    initialDelayMs={2100}
-                    yPx={24}
-                  />
-                </span>
-
-                <span
-                  aria-hidden="true"
-                  className={`hero-title-gradient ${
-                    showHeadlineGradient
-                      ? "is-visible"
-                      : "is-hidden"
-                  }`}
-                >
-                  <AnimatedGradientText className="hero-gradient-text">
-                    {HEADLINE_HIGHLIGHT}
-                  </AnimatedGradientText>
-                </span>
-              </span>
-            </h1>
+            <HeroHeadline
+              key={language}
+              prefix={t.hero.headlinePrefix}
+              highlight={t.hero.headlineHighlight}
+            />
 
             <div className="hero-bottom">
               <p className="hero-description hero-reveal">
-                Desarrollo{" "}
+                {t.hero.descriptionPrefix}
                 <strong>
-                  soluciones claras, funcionales y atractivas
+                  {t.hero.descriptionStrong}
                 </strong>
-                , pensadas para resolver necesidades reales.
+                {t.hero.descriptionSuffix}
               </p>
 
               <div className="hero-actions hero-reveal">
@@ -127,7 +148,7 @@ export function Hero() {
                   className="hero-action hero-action--primary"
                 >
                   <span className="hero-action-label">
-                    Ver trabajos
+                    {t.hero.primaryAction}
 
                     <span
                       aria-hidden="true"
@@ -141,7 +162,7 @@ export function Hero() {
                   className="hero-action hero-action--secondary"
                 >
                   <span className="hero-action-label">
-                    Hablemos
+                    {t.hero.secondaryAction}
 
                     <span
                       aria-hidden="true"

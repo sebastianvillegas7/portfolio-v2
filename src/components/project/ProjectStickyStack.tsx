@@ -15,9 +15,8 @@ import {
 } from "motion/react";
 
 import { CountryFlag } from "@/components/project/CountryFlag";
-
 import { ProjectDevicePreview } from "@/components/project/ProjectDevicePreview";
-
+import { useLanguage } from "@/i18n/LanguageProvider";
 import type { Project } from "@/types/project";
 
 type ProjectStickyStackProps = {
@@ -96,6 +95,8 @@ function ProjectStickyCard({
   total,
   progress,
 }: ProjectStickyCardProps) {
+  const { t } = useLanguage();
+
   const { start, end } = getEntryWindow(index, total);
 
   /*
@@ -289,11 +290,11 @@ function ProjectStickyCard({
 
           <div className="project-sticky-footer">
             <span className="project-sticky-footer-label">
-              Diseño &amp; desarrollo
+              {t.selectedWork.designDevelopment}
             </span>
 
             <span className="project-sticky-cta">
-              <span>Explorar proyecto</span>
+              <span>{t.selectedWork.exploreProject}</span>
 
               <ArrowUpRight aria-hidden="true" />
             </span>

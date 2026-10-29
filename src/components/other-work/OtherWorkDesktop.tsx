@@ -7,6 +7,7 @@ import {
 } from "motion/react";
 
 import { ProjectCountryBadge } from "@/components/other-work/ProjectCountryBadge";
+import { useLanguage } from "@/i18n/LanguageProvider";
 import type { Project } from "@/types/project";
 
 type OtherWorkDesktopProps = {
@@ -32,6 +33,8 @@ export function OtherWorkDesktop({
   handleNext,
   autoPlayDuration,
 }: OtherWorkDesktopProps) {
+  const { t } = useLanguage();
+
   return (
 <div className="hidden md:grid md:grid-cols-12 md:items-stretch md:gap-8 lg:gap-12">
   <div className="col-span-5 flex flex-col justify-center">
@@ -161,13 +164,17 @@ export function OtherWorkDesktop({
                           }
                           className="mt-2 inline-flex text-xs font-medium uppercase tracking-[0.15em] text-foreground/70 transition hover:text-foreground"
                         >
-                          Visit
-                          project ↗
+                          {
+                            t.otherWork
+                              .visitProject
+                          }
                         </a>
                       ) : (
                         <span className="mt-2 inline-flex text-xs font-medium uppercase tracking-[0.15em] text-foreground-subtle">
-                          In
-                          development
+                          {
+                            t.otherWork
+                              .inDevelopment
+                          }
                         </span>
                       )}
                     </motion.div>
@@ -230,7 +237,11 @@ export function OtherWorkDesktop({
 
           <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent px-7 pb-7 pt-24 text-white">
             <p className="text-xs uppercase tracking-[0.2em] text-white/55">
-              Project /
+              {
+                t.otherWork
+                  .projectLabel
+              }{" "}
+              /
               {String(
                 activeIndex +
                   1,
@@ -258,7 +269,10 @@ export function OtherWorkDesktop({
             handlePrev
           }
           className="flex h-11 w-11 items-center justify-center rounded-full border border-white/15 bg-black/35 text-white backdrop-blur-md transition hover:bg-black/55"
-          aria-label="Anterior"
+          aria-label={
+            t.otherWork
+              .previous
+          }
         >
           ←
         </button>
@@ -269,7 +283,10 @@ export function OtherWorkDesktop({
             handleNext
           }
           className="flex h-11 w-11 items-center justify-center rounded-full border border-white/15 bg-black/35 text-white backdrop-blur-md transition hover:bg-black/55"
-          aria-label="Siguiente"
+          aria-label={
+            t.otherWork
+              .next
+          }
         >
           →
         </button>

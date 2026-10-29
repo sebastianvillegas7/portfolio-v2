@@ -1,12 +1,31 @@
 "use client";
 
+import { useMemo } from "react";
+
 import { motion } from "motion/react";
 
 import { OtherWorkTabs } from "@/components/other-work/OtherWorkTabs";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { otherProjects } from "@/data/projects";
+import { useLanguage } from "@/i18n/LanguageProvider";
+import { localizeProjects } from "@/i18n/translations";
 
 export function OtherWork() {
+  const {
+    language,
+    t,
+  } = useLanguage();
+
+  const localizedProjects =
+    useMemo(
+      () =>
+        localizeProjects(
+          otherProjects,
+          language,
+        ),
+      [language],
+    );
+
   return (
     <section
       id="OtherWork"
@@ -31,13 +50,21 @@ export function OtherWork() {
         }}
       >
         <SectionHeading
-          eyebrow="More Projects"
-          title="Other Work"
+          eyebrow={
+            t.otherWork.eyebrow
+          }
+          title={
+            t.otherWork.title
+          }
           titleId="other-work-title"
           className="mb-10 md:mb-14"
         />
 
-        <OtherWorkTabs projects={otherProjects} />
+        <OtherWorkTabs
+          projects={
+            localizedProjects
+          }
+        />
       </motion.div>
     </section>
   );

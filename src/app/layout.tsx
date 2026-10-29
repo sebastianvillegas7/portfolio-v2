@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { IBM_Plex_Mono, Inter_Tight } from "next/font/google";
 
 import { Footer } from "@/components/layout/Footer";
+import { LanguageProvider } from "@/i18n/LanguageProvider";
 
 import "./globals.css";
 
@@ -29,8 +30,10 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body className={`${interTight.variable} ${ibmPlexMono.variable}`}>
-        <main>{children}</main>
-        <Footer />
+        <LanguageProvider>
+          <main>{children}</main>
+          <Footer />
+        </LanguageProvider>
       </body>
     </html>
   );

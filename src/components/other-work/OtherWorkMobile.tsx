@@ -8,6 +8,7 @@ import {
 } from "motion/react";
 
 import { ProjectCountryBadge } from "@/components/other-work/ProjectCountryBadge";
+import { useLanguage } from "@/i18n/LanguageProvider";
 import type { Project } from "@/types/project";
 
 type OtherWorkMobileProps = {
@@ -23,6 +24,8 @@ export function OtherWorkMobile({
   goTo,
   autoPlayDuration,
 }: OtherWorkMobileProps) {
+  const { t } = useLanguage();
+
   return (
 <div className="md:hidden">
   <div className="overflow-hidden rounded-[1.6rem] border border-border/50 bg-surface-1">
@@ -191,13 +194,13 @@ export function OtherWorkMobile({
                               className="project-sticky-link inline-flex"
                             >
                               <span className="project-sticky-cta">
-                                <span>Explorar proyecto</span>
+                                <span>{t.otherWork.exploreProject}</span>
                                 <ArrowUpRight aria-hidden="true" />
                               </span>
                             </a>
                           ) : (
                             <span className="inline-flex min-h-10 items-center rounded-full border border-border/70 px-4 text-[0.6rem] font-medium uppercase tracking-[0.12em] text-foreground-subtle">
-                              Proyecto en desarrollo
+                              {t.otherWork.projectInDevelopment}
                             </span>
                           )}
                         </div>

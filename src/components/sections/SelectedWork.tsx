@@ -1,6 +1,9 @@
 "use client";
 
-import { useRef } from "react";
+import {
+  useMemo,
+  useRef,
+} from "react";
 
 import {
   motion,
@@ -12,10 +15,27 @@ import {
 import { ProjectStickyStack } from "@/components/project/ProjectStickyStack";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { featuredProjects } from "@/data/projects";
+import { useLanguage } from "@/i18n/LanguageProvider";
+import { localizeProjects } from "@/i18n/translations";
 
 import "@/styles/selected-work.css";
 
 export function SelectedWork() {
+  const {
+    language,
+    t,
+  } = useLanguage();
+
+  const localizedProjects =
+    useMemo(
+      () =>
+        localizeProjects(
+          featuredProjects,
+          language,
+        ),
+      [language],
+    );
+
   const titleRef =
     useRef<HTMLDivElement>(null);
 
@@ -53,7 +73,7 @@ export function SelectedWork() {
       <div className="page-container relative z-10">
         <div className="selected-work-stage">
           <ProjectStickyStack
-            projects={featuredProjects}
+            projects={localizedProjects}
             title={
               <motion.div
                 ref={titleRef}
@@ -63,17 +83,22 @@ export function SelectedWork() {
                 }}
               >
                 <SectionHeading
-                  eyebrow="Selected Work"
-                  title="Trabajo seleccionado"
+                  eyebrow={
+                    t.selectedWork.eyebrow
+                  }
+                  title={
+                    t.selectedWork.title
+                  }
                   titleId="selected-work-title"
                 />
               </motion.div>
             }
             intro={
               <>
-                Una selección de productos digitales,
-                experiencias web y e-commerce desarrollados
-                para necesidades reales.
+                {
+                  t.selectedWork
+                    .intro
+                }
               </>
             }
           />
