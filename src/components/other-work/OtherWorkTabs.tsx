@@ -8,9 +8,11 @@ import {
 
 import { OtherWorkDesktop } from "@/components/other-work/OtherWorkDesktop";
 import { OtherWorkMobile } from "@/components/other-work/OtherWorkMobile";
+import { useMediaQuery } from "@/hooks/use-media-query";
 import type { Project } from "@/types/project";
 
 const AUTO_PLAY_DURATION = 7000;
+const DESKTOP_MEDIA_QUERY = "(min-width: 768px)";
 
 type OtherWorkTabsProps = {
   projects: Project[];
@@ -24,6 +26,10 @@ export function OtherWorkTabs({
 
   const [isPaused, setIsPaused] =
     useState(false);
+
+  const isDesktop = useMediaQuery(
+    DESKTOP_MEDIA_QUERY,
+  );
 
   const len = projects.length;
 
@@ -101,24 +107,26 @@ export function OtherWorkTabs({
 
   return (
     <div className="w-full">
-      <OtherWorkMobile
-        projects={projects}
-        activeIndex={activeIndex}
-        goTo={goTo}
-        autoPlayDuration={AUTO_PLAY_DURATION}
-      />
-
-      <OtherWorkDesktop
-        projects={projects}
-        activeIndex={activeIndex}
-        activeProject={activeProject}
-        goTo={goTo}
-        isPaused={isPaused}
-        setIsPaused={setIsPaused}
-        handlePrev={handlePrev}
-        handleNext={handleNext}
-        autoPlayDuration={AUTO_PLAY_DURATION}
-      />
+      {isDesktop ? (
+        <OtherWorkDesktop
+          projects={projects}
+          activeIndex={activeIndex}
+          activeProject={activeProject}
+          goTo={goTo}
+          isPaused={isPaused}
+          setIsPaused={setIsPaused}
+          handlePrev={handlePrev}
+          handleNext={handleNext}
+          autoPlayDuration={AUTO_PLAY_DURATION}
+        />
+      ) : (
+        <OtherWorkMobile
+          projects={projects}
+          activeIndex={activeIndex}
+          goTo={goTo}
+          autoPlayDuration={AUTO_PLAY_DURATION}
+        />
+      )}
     </div>
   );
 }
