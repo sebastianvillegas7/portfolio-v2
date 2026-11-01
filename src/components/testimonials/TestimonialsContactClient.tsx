@@ -41,10 +41,10 @@ export function TestimonialsContactClient({
     language === "es"
       ? {
           eyebrow: "Testimonios & contacto",
-          title: "Experiencias reales. Próximo proyecto.",
-          testimonialsLabel: "Lo que dicen mis alumnos",
+          title: "Experiencias reales.",
+          testimonialsLabel: "Experiencias de alumnos y clientes",
           testimonialsDescription:
-            "Experiencias reales de alumnos con los que trabajé de forma personalizada.",
+            "Testimonios de personas con las que trabajé en clases y proyectos.",
           contactTitle: "¿Hablamos?",
           contactDescription:
             "Dejame tus datos y yo me pongo en contacto.",
@@ -60,10 +60,10 @@ export function TestimonialsContactClient({
         }
       : {
           eyebrow: "Testimonials & contact",
-          title: "Real experiences. Your project next.",
-          testimonialsLabel: "What my students say",
+          title: "Real experiences.",
+          testimonialsLabel: "Students & clients",
           testimonialsDescription:
-            "Real experiences from students I have worked with one-to-one.",
+            "Feedback from people I have worked with through programming lessons and development projects.",
           contactTitle: "Let's talk",
           contactDescription:
             "Leave your details and I'll get in touch.",

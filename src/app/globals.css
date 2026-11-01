@@ -69,6 +69,24 @@
     ),
     linear-gradient(145deg, var(--surface-1) 0%, var(--surface-2) 100%);
 
+  /* Testimonials */
+  --testimonial-card-bg: var(--surface-2);
+  --testimonial-card-border: var(--border-subtle);
+  --testimonial-card-border-active: rgb(255 255 255 / 0.18);
+  --testimonial-chip-bg: rgb(255 255 255 / 0.055);
+  --testimonial-chip-border: rgb(255 255 255 / 0.12);
+
+  /* Technology badges */
+  --tech-java: 232 112 30;
+  --tech-javascript: 247 223 30;
+  --tech-python: 55 118 171;
+  --tech-angular: 221 0 49;
+  --tech-react: 97 218 251;
+  --tech-c-family: 98 80 190;
+  --tech-sql: 0 117 143;
+  --tech-mongodb: 71 162 72;
+  --tech-html-css: 227 76 38;
+
   /* ? LAYOUT */
   --page-max-width: 100rem;
   --page-padding-x: 1.25rem;
@@ -103,6 +121,64 @@
 .service-mini-card-icon {
   border-color: var(--service-card-icon-border);
   background: var(--service-card-icon-bg);
+}
+
+.testimonial-card {
+  border-color: var(--testimonial-card-border);
+  background: var(--testimonial-card-bg);
+}
+
+.testimonial-card--active {
+  border-color: var(--testimonial-card-border-active);
+}
+
+.testimonial-meta-chip {
+  border-color: var(--testimonial-chip-border);
+  background: var(--testimonial-chip-bg);
+}
+
+.tech-badge {
+  --tech-color: 160 160 166;
+
+  border: 1px solid rgb(var(--tech-color) / 0.38);
+  background: rgb(var(--tech-color) / 0.12);
+  color: rgb(var(--tech-color) / 0.95);
+}
+
+.tech-badge--java {
+  --tech-color: var(--tech-java);
+}
+
+.tech-badge--javascript {
+  --tech-color: var(--tech-javascript);
+}
+
+.tech-badge--python {
+  --tech-color: var(--tech-python);
+}
+
+.tech-badge--angular {
+  --tech-color: var(--tech-angular);
+}
+
+.tech-badge--react {
+  --tech-color: var(--tech-react);
+}
+
+.tech-badge--c-family {
+  --tech-color: var(--tech-c-family);
+}
+
+.tech-badge--sql {
+  --tech-color: var(--tech-sql);
+}
+
+.tech-badge--mongodb {
+  --tech-color: var(--tech-mongodb);
+}
+
+.tech-badge--html-css {
+  --tech-color: var(--tech-html-css);
 }
 
 .page-container {
