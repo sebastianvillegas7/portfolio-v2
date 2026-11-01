@@ -1,6 +1,5 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@import "../styles/other-work.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -40,6 +39,36 @@
     var(--brand-500)
   );
 
+  /* Services */
+  --service-card-bg: var(--surface-2);
+  --service-card-border: var(--border-subtle);
+  --service-card-icon-bg: rgb(255 255 255 / 0.055);
+  --service-card-icon-border: rgb(255 255 255 / 0.15);
+  --service-card-fade: linear-gradient(
+    180deg,
+    rgb(25 25 28 / 0) 0%,
+    rgb(25 25 28 / 0.04) 20%,
+    rgb(25 25 28 / 0.12) 34%,
+    rgb(25 25 28 / 0.28) 46%,
+    rgb(25 25 28 / 0.52) 58%,
+    rgb(25 25 28 / 0.74) 68%,
+    rgb(25 25 28 / 0.90) 78%,
+    rgb(25 25 28 / 0.98) 87%,
+    var(--service-card-bg) 94%,
+    var(--service-card-bg) 100%
+  );
+  --service-card-texture: radial-gradient(
+      circle at 18% 14%,
+      rgb(255 255 255 / 0.055),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 82% 86%,
+      rgb(255 255 255 / 0.025),
+      transparent 38%
+    ),
+    linear-gradient(145deg, var(--surface-1) 0%, var(--surface-2) 100%);
+
   /* ? LAYOUT */
   --page-max-width: 100rem;
   --page-padding-x: 1.25rem;
@@ -58,6 +87,24 @@
   --space-2xl: 4rem;
 }
 
+.service-mini-card {
+  border-color: var(--service-card-border);
+  background: var(--service-card-bg);
+}
+
+.service-mini-card--textured {
+  background: var(--service-card-texture);
+}
+
+.service-mini-card-fade {
+  background: var(--service-card-fade);
+}
+
+.service-mini-card-icon {
+  border-color: var(--service-card-icon-border);
+  background: var(--service-card-icon-bg);
+}
+
 .page-container {
   width: 100%;
   max-width: var(--page-max-width);
@@ -68,6 +115,10 @@
 .section {
   position: relative;
   padding-block: var(--section-space-y);
+}
+
+#OtherWork {
+  padding-top: calc(var(--section-space-y) + 3rem);
 }
 
 .section-content {

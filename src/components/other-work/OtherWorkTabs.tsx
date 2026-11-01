@@ -3,6 +3,7 @@
 import {
   useCallback,
   useEffect,
+  useRef,
   useState,
 } from "react";
 
@@ -21,17 +22,69 @@ type OtherWorkTabsProps = {
 export function OtherWorkTabs({
   projects,
 }: OtherWorkTabsProps) {
+  const containerRef =
+    useRef<HTMLDivElement>(null);
+
   const [activeIndex, setActiveIndex] =
     useState(0);
 
   const [isPaused, setIsPaused] =
     useState(false);
 
+  const [isVisible, setIsVisible] =
+    useState(false);
+
+  const [visibilityCycle, setVisibilityCycle] =
+    useState(0);
+
   const isDesktop = useMediaQuery(
     DESKTOP_MEDIA_QUERY,
   );
 
   const len = projects.length;
+
+  useEffect(() => {
+    const element =
+      containerRef.current;
+
+    if (!element) {
+      return;
+    }
+
+    const observer =
+      new IntersectionObserver(
+        ([entry]) => {
+          const nextVisible =
+            entry?.isIntersecting ??
+            false;
+
+          setIsVisible(
+            (currentVisible) => {
+              if (
+                nextVisible &&
+                !currentVisible
+              ) {
+                setVisibilityCycle(
+                  (current) =>
+                    current + 1,
+                );
+              }
+
+              return nextVisible;
+            },
+          );
+        },
+        {
+          threshold: 0.08,
+        },
+      );
+
+    observer.observe(element);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
 
   const goTo = useCallback(
     (index: number) => {
@@ -40,7 +93,8 @@ export function OtherWorkTabs({
       }
 
       setActiveIndex(
-        ((index % len) + len) % len,
+        ((index % len) + len) %
+          len,
       );
 
       setIsPaused(false);
@@ -76,26 +130,29 @@ export function OtherWorkTabs({
   useEffect(() => {
     if (
       isPaused ||
+      !isVisible ||
       len <= 1
     ) {
       return;
     }
 
-    const interval =
-      window.setInterval(
+    const timeout =
+      window.setTimeout(
         handleNext,
         AUTO_PLAY_DURATION,
       );
 
     return () =>
-      window.clearInterval(
-        interval,
+      window.clearTimeout(
+        timeout,
       );
   }, [
     activeIndex,
     handleNext,
     isPaused,
+    isVisible,
     len,
+    visibilityCycle,
   ]);
 
   if (len === 0) {
@@ -106,7 +163,10 @@ export function OtherWorkTabs({
     projects[activeIndex]!;
 
   return (
-    <div className="w-full">
+    <div
+      ref={containerRef}
+      className="w-full"
+    >
       {isDesktop ? (
         <OtherWorkDesktop
           projects={projects}
@@ -125,6 +185,8 @@ export function OtherWorkTabs({
           activeIndex={activeIndex}
           goTo={goTo}
           autoPlayDuration={AUTO_PLAY_DURATION}
+          isVisible={isVisible}
+          visibilityCycle={visibilityCycle}
         />
       )}
     </div>

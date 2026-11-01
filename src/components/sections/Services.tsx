@@ -1,9 +1,27 @@
+"use client";
+
+import Three from "@/components/animata/bento-grid/three";
+import { SectionHeading } from "@/components/ui/SectionHeading";
+import { useLanguage } from "@/i18n/LanguageProvider";
+
 export function Services() {
+  const { t } = useLanguage();
+
   return (
-    <section id="Services" className="border-b border-border/50 py-24">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        <p className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">Section placeholder</p>
-        <h2 className="mt-3 text-3xl font-semibold tracking-tight">Services</h2>
+    <section
+      id="Services"
+      className="section"
+      aria-labelledby="services-title"
+    >
+      <div className="page-container">
+        <SectionHeading
+          eyebrow={t.services.eyebrow}
+          title={t.services.title}
+          titleId="services-title"
+          className="mb-10 md:mb-14"
+        />
+
+        <Three />
       </div>
     </section>
   );

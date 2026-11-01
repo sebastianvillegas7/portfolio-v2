@@ -16,6 +16,8 @@ type OtherWorkMobileProps = {
   activeIndex: number;
   goTo: (index: number) => void;
   autoPlayDuration: number;
+  isVisible: boolean;
+  visibilityCycle: number;
 };
 
 export function OtherWorkMobile({
@@ -23,199 +25,204 @@ export function OtherWorkMobile({
   activeIndex,
   goTo,
   autoPlayDuration,
+  isVisible,
+  visibilityCycle,
 }: OtherWorkMobileProps) {
   const { t } = useLanguage();
 
   return (
-<div className="md:hidden">
-  <div className="overflow-hidden rounded-[1.6rem] border border-border/50 bg-surface-1">
-    {projects.map(
-      (
-        project,
-        index,
-      ) => {
-        const isActive =
-          index ===
-          activeIndex;
+    <div className="md:hidden">
+      <div className="overflow-hidden rounded-[1.6rem] border border-border/50 bg-surface-1">
+        {projects.map(
+          (
+            project,
+            index,
+          ) => {
+            const isActive =
+              index ===
+              activeIndex;
 
-        return (
-          <article
-            key={
-              project.slug
-            }
-            className="border-b border-border/50 last:border-b-0"
-          >
-            <button
-              type="button"
-              onClick={() =>
-                goTo(index)
-              }
-              className="relative flex w-full items-center gap-3 px-4 py-3 text-left"
-            >
-              <span className="text-[0.58rem] font-medium tabular-nums text-foreground-subtle">
-                /
-                {String(
-                  index + 1,
-                ).padStart(
-                  2,
-                  "0",
-                )}
-              </span>
-
-              <span
-                className={[
-                  "text-sm tracking-[-0.02em] transition-colors duration-200",
-                  isActive
-                    ? "font-medium text-foreground"
-                    : "text-foreground-muted",
-                ].join(
-                  " ",
-                )}
-              >
-                {
-                  project.title
+            return (
+              <article
+                key={
+                  project.slug
                 }
-              </span>
-
-              {isActive && (
-                <div className="absolute inset-x-0 bottom-0 h-px bg-border/60">
-                  <motion.div
-                    key={project.slug}
-                    className="h-full origin-left bg-brand-soft"
-                    initial={{
-                      scaleX: 0,
-                    }}
-                    animate={{
-                      scaleX: 1,
-                    }}
-                    transition={{
-                      duration:
-                        autoPlayDuration /
-                        1000,
-                      ease: "linear",
-                    }}
-                    style={{
-                      willChange: "transform",
-                      transformOrigin: "left center",
-                    }}
-                  />
-                </div>
-              )}
-            </button>
-
-            <AnimatePresence
-              initial={false}
-            >
-              {isActive && (
-                <motion.div
-                  key={
-                    project.slug
+                className="border-b border-border/50 last:border-b-0"
+              >
+                <button
+                  type="button"
+                  onClick={() =>
+                    goTo(index)
                   }
-                  initial={{
-                    height:
-                      0,
-                    opacity:
-                      0,
-                  }}
-                  animate={{
-                    height:
-                      "auto",
-                    opacity:
-                      1,
-                  }}
-                  exit={{
-                    height:
-                      0,
-                    opacity:
-                      0,
-                  }}
-                  transition={{
-                    duration:
-                      0.42,
-                    ease: [
-                      0.22,
-                      1,
-                      0.36,
-                      1,
-                    ],
-                  }}
-                  className="overflow-hidden"
+                  className="relative flex w-full items-center gap-3 px-4 py-3 text-left"
                 >
-                  <div className="px-4 pb-5 pt-4">
-                    <MobileProjectPreview
-                      project={
-                        project
-                      }
-                    />
+                  <span className="text-[0.58rem] font-medium tabular-nums text-foreground-subtle">
+                    /
+                    {String(
+                      index + 1,
+                    ).padStart(
+                      2,
+                      "0",
+                    )}
+                  </span>
 
-                    <div className="mt-4">
-                      <p className="text-[0.58rem] font-medium uppercase tracking-[0.14em] text-brand-soft">
-                        {
-                          project.category
-                        }
-                      </p>
+                  <span
+                    className={[
+                      "text-sm tracking-[-0.02em] transition-colors duration-200",
+                      isActive
+                        ? "font-medium text-foreground"
+                        : "text-foreground-muted",
+                    ].join(
+                      " ",
+                    )}
+                  >
+                    {
+                      project.title
+                    }
+                  </span>
 
-                      <div className="mt-2 flex items-center justify-between gap-3">
-                        <h3 className="min-w-0 text-[1.65rem] font-semibold leading-none tracking-[-0.04em] text-foreground">
-                          {project.title}
-                        </h3>
-
-                        <ProjectCountryBadge project={project} variant="mobile" />
+                  {isActive &&
+                    isVisible && (
+                      <div className="absolute inset-x-0 bottom-0 h-px bg-border/60">
+                        <motion.div
+                          key={`${project.slug}-${visibilityCycle}`}
+                          className="h-full origin-left bg-brand-soft"
+                          initial={{
+                            scaleX: 0,
+                          }}
+                          animate={{
+                            scaleX: 1,
+                          }}
+                          transition={{
+                            duration:
+                              autoPlayDuration /
+                              1000,
+                            ease: "linear",
+                          }}
+                          style={{
+                            transformOrigin:
+                              "left center",
+                          }}
+                        />
                       </div>
+                    )}
+                </button>
 
-                      <p className="mt-3 text-[0.82rem] leading-[1.55] text-foreground-muted">
-                        {
-                          project.description
+                <div
+                  className={[
+                    "grid transition-[grid-template-rows,opacity] duration-500",
+                    isActive
+                      ? "grid-rows-[1fr] opacity-100"
+                      : "grid-rows-[0fr] opacity-0",
+                  ].join(" ")}
+                >
+                  <div className="min-h-0 overflow-hidden">
+                    <div className="px-4 pb-5 pt-4">
+                      <MobileProjectPreview
+                        project={
+                          project
                         }
-                      </p>
+                      />
 
-                      <div className="mt-5 flex items-center justify-between gap-3">
-                        {project.technologies.length > 0 && (
-                          <div className="flex min-w-0 flex-wrap items-center gap-1.5">
-                            {project.technologies
-                              .slice(0, 4)
-                              .map((technology) => (
-                                <span
-                                  key={technology}
-                                  className="rounded-full border border-border/70 bg-background/35 px-2 py-1 text-[0.52rem] text-foreground-muted"
-                                >
-                                  {technology}
-                                </span>
-                              ))}
-                          </div>
-                        )}
+                      <div className="mt-4">
+                        <p className="text-[0.58rem] font-medium uppercase tracking-[0.14em] text-brand-soft">
+                          {
+                            project.category
+                          }
+                        </p>
 
-                        <div className="shrink-0">
-                          {project.url ? (
-                            <a
-                              href={project.url}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="project-sticky-link inline-flex"
-                            >
-                              <span className="project-sticky-cta">
-                                <span>{t.otherWork.exploreProject}</span>
-                                <ArrowUpRight aria-hidden="true" />
-                              </span>
-                            </a>
-                          ) : (
-                            <span className="inline-flex min-h-10 items-center rounded-full border border-border/70 px-4 text-[0.6rem] font-medium uppercase tracking-[0.12em] text-foreground-subtle">
-                              {t.otherWork.projectInDevelopment}
-                            </span>
+                        <div className="mt-2 flex items-center justify-between gap-3">
+                          <h3 className="min-w-0 text-[1.65rem] font-semibold leading-none tracking-[-0.04em] text-foreground">
+                            {
+                              project.title
+                            }
+                          </h3>
+
+                          <ProjectCountryBadge
+                            project={
+                              project
+                            }
+                            variant="mobile"
+                          />
+                        </div>
+
+                        <p className="mt-3 text-[0.82rem] leading-[1.55] text-foreground-muted">
+                          {
+                            project.description
+                          }
+                        </p>
+
+                        <div className="mt-5 flex items-center justify-between gap-3">
+                          {project
+                            .technologies
+                            .length >
+                            0 && (
+                            <div className="flex min-w-0 flex-wrap items-center gap-1.5">
+                              {project.technologies
+                                .slice(
+                                  0,
+                                  4,
+                                )
+                                .map(
+                                  (
+                                    technology,
+                                  ) => (
+                                    <span
+                                      key={
+                                        technology
+                                      }
+                                      className="rounded-full border border-border/70 bg-background/35 px-2 py-1 text-[0.52rem] text-foreground-muted"
+                                    >
+                                      {
+                                        technology
+                                      }
+                                    </span>
+                                  ),
+                                )}
+                            </div>
                           )}
+
+                          <div className="shrink-0">
+                            {project.url ? (
+                              <a
+                                href={
+                                  project.url
+                                }
+                                target="_blank"
+                                rel="noreferrer"
+                                className="project-sticky-link inline-flex"
+                              >
+                                <span className="project-sticky-cta">
+                                  <span>
+                                    {
+                                      t.otherWork
+                                        .exploreProject
+                                    }
+                                  </span>
+
+                                  <ArrowUpRight aria-hidden="true" />
+                                </span>
+                              </a>
+                            ) : (
+                              <span className="inline-flex min-h-10 items-center rounded-full border border-border/70 px-4 text-[0.6rem] font-medium uppercase tracking-[0.12em] text-foreground-subtle">
+                                {
+                                  t.otherWork
+                                    .projectInDevelopment
+                                }
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </article>
-        );
-      },
-    )}
-  </div>
-</div>
+                </div>
+              </article>
+            );
+          },
+        )}
+      </div>
+    </div>
   );
 }
 
