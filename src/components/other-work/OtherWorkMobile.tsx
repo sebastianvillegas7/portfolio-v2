@@ -2,8 +2,7 @@
 
 import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
-import {
-  AnimatePresence,
+import {  
   motion,
 } from "motion/react";
 
