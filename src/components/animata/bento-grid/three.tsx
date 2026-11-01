@@ -9,17 +9,21 @@ import {
   type ReactNode,
 } from "react";
 
-import { LucideIcon, LayoutDashboard, Workflow } from "lucide-react";
 import {
   Code2,
   GraduationCap,
+  LayoutDashboard,
+  Lightbulb,
   MonitorSmartphone,
   PanelsTopLeft,
   PlugZap,
   Presentation,
+  Rocket,
   ShoppingBag,
   UserRound,
   Video,
+  Workflow,
+  type LucideIcon,
 } from "lucide-react";
 import {
   AnimatePresence,
@@ -89,12 +93,12 @@ function ServiceGroup({
       viewport={
         startLater
           ? {
-              once: false,
+              once: true,
               amount: 0.22,
               margin: "0px 0px -14% 0px",
             }
           : {
-              once: false,
+              once: true,
               amount: 0.14,
             }
       }
@@ -111,6 +115,7 @@ function MainCard({
   title,
   description,
   icon,
+  active,
   children,
 }: {
   image: string;
@@ -119,6 +124,7 @@ function MainCard({
   title: string;
   description: string;
   icon: ReactNode;
+  active: boolean;
   children?: ReactNode;
 }) {
   return (
@@ -131,7 +137,8 @@ function MainCard({
         alt=""
         fill
         loading="eager"
-        sizes="(max-width: 767px) calc(100vw - 2rem), 680px"
+        sizes="(max-width: 767px) calc(100vw - 2.5rem), 680px"
+        decoding="async"
         className="object-cover object-center"
       />
 
@@ -149,15 +156,27 @@ function MainCard({
           backgroundSize: "300% 100%",
           backgroundRepeat: "no-repeat",
         }}
-        animate={{
-          backgroundPosition: ["200% 0%", "-100% 0%"],
-        }}
-        transition={{
-          duration: 7,
-          repeat: Infinity,
-          repeatDelay: 5,
-          ease: "linear",
-        }}
+        animate={
+          active
+            ? {
+                backgroundPosition: ["200% 0%", "-100% 0%"],
+              }
+            : {
+                backgroundPosition: "200% 0%",
+              }
+        }
+        transition={
+          active
+            ? {
+                duration: 7,
+                repeat: Infinity,
+                repeatDelay: 5,
+                ease: "linear",
+              }
+            : {
+                duration: 0.2,
+              }
+        }
       />
 
       <div className="relative z-10 flex min-h-[16rem] flex-col justify-between">
@@ -201,37 +220,22 @@ function VisualServiceCard({
   images,
   intervalMs = 3000,
 }: VisualServiceCardProps) {
-  const [activeIndex, setActiveIndex] =
-    useState(0);
+  const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
-    if (
-      !active ||
-      slides.length <= 1
-    ) {
-      return;
-    }
+    if (!active || slides.length <= 1) return;
 
-    const interval =
-      window.setInterval(() => {
-        setActiveIndex(
-          (current) =>
-            (current + 1) %
-            slides.length,
-        );
-      }, intervalMs);
-
-    return () =>
-      window.clearInterval(
-        interval,
+    const interval = window.setInterval(() => {
+      setActiveIndex(
+        (current) => (current + 1) % slides.length,
       );
+    }, intervalMs);
+
+    return () => window.clearInterval(interval);
   }, [active, intervalMs, slides.length]);
 
-  const current =
-    slides[activeIndex]!;
-
-  const visualItem =
-    images[activeIndex % images.length]!;
+  const current = slides[activeIndex]!;
+  const visualItem = images[activeIndex % images.length]!;
 
   return (
     <motion.article
@@ -256,12 +260,14 @@ function VisualServiceCard({
             }}
             className="absolute inset-0"
           >
-            <div
-              aria-hidden="true"
-              className="absolute inset-0 bg-cover bg-center"
-              style={{
-                backgroundImage: `url('${visualItem}')`,
-              }}
+            <Image
+              src={visualItem}
+              alt=""
+              fill
+              sizes="(max-width: 767px) 44vw, 340px"
+              loading={activeIndex === 0 ? "eager" : "lazy"}
+              decoding="async"
+              className="object-cover object-center"
             />
           </motion.div>
         </AnimatePresence>
@@ -319,8 +325,10 @@ function VisualServiceCard({
 
 function CapabilityServiceCard({
   items,
+  active,
 }: {
   items: readonly MicroSlide[];
+  active: boolean;
 }) {
   return (
     <motion.article
@@ -357,19 +365,175 @@ function CapabilityServiceCard({
                   <motion.span
                     aria-hidden="true"
                     className="absolute left-1/2 top-0 size-1 -translate-x-1/2 rounded-full bg-white/60"
-                    animate={{
-                      y: [0, 18],
-                      opacity: [0, 1, 0],
-                    }}
-                    transition={{
-                      duration: 2.6,
-                      repeat: Infinity,
-                      ease: "linear",
-                    }}
+                    animate={
+                      active
+                        ? {
+                            y: [0, 18],
+                            opacity: [0, 1, 0],
+                          }
+                        : {
+                            y: 0,
+                            opacity: 0,
+                          }
+                    }
+                    transition={
+                      active
+                        ? {
+                            duration: 2.6,
+                            repeat: Infinity,
+                            ease: "linear",
+                          }
+                        : {
+                            duration: 0.2,
+                          }
+                    }
                   />
                 </div>
               ) : null}
             </Fragment>
+          );
+        })}
+      </div>
+    </motion.article>
+  );
+}
+
+function LearningProgressCard({
+  items,
+  active,
+  intervalMs = 4200,
+}: {
+  items: readonly [MicroSlide, MicroSlide, MicroSlide];
+  active: boolean;
+  intervalMs?: number;
+}) {
+  const [activeIndex, setActiveIndex] =
+    useState(0);
+
+  useEffect(() => {
+    if (!active) {
+      return;
+    }
+
+    const interval =
+      window.setInterval(() => {
+        setActiveIndex(
+          (current) =>
+            (current + 1) % items.length,
+        );
+      }, intervalMs);
+
+    return () =>
+      window.clearInterval(interval);
+  }, [active, intervalMs, items.length]);
+
+  const offsets = [
+    "mr-[18%]",
+    "ml-[12%] mr-[6%]",
+    "ml-[24%]",
+  ];
+
+  return (
+    <motion.article
+      variants={cardVariants}
+      className="service-mini-card service-mini-card--textured relative overflow-hidden rounded-[1.55rem] border p-5 text-white"
+    >
+      <div className="relative z-10 flex h-full flex-col justify-between">
+        {items.map((item, index) => {
+          const Icon = item.icon;
+          const isActive =
+            index === activeIndex;
+
+          return (
+            <motion.div
+              key={item.title}
+              initial={false}
+              className={[
+                "relative flex items-center gap-3",
+                offsets[index],
+              ].join(" ")}
+              animate={{
+                opacity: isActive
+                  ? 1
+                  : 0.58,
+              }}
+              transition={{
+                duration: 1.15,
+                ease: [0.22, 1, 0.36, 1],
+              }}
+            >
+              <motion.div
+                initial={false}
+                className="service-mini-card-icon flex size-9 shrink-0 items-center justify-center rounded-full border"
+                animate={{
+                  boxShadow: isActive
+                    ? "0 0 12px rgba(168,183,255,0.32)"
+                    : "0 0 0px rgba(168,183,255,0)",
+                  borderColor: isActive
+                    ? "rgba(255,255,255,0.25)"
+                    : "rgba(255,255,255,0.15)",
+                  backgroundColor: isActive
+                    ? "rgba(255,255,255,0.085)"
+                    : "rgba(255,255,255,0.055)",
+                }}
+                transition={{
+                  duration: 1.15,
+                  ease: [0.22, 1, 0.36, 1],
+                }}
+              >
+                <motion.div
+                  initial={false}
+                  animate={{
+                    opacity: isActive
+                      ? 1
+                      : 0.62,
+                  }}
+                  transition={{
+                    duration: 1.15,
+                    ease: [0.22, 1, 0.36, 1],
+                  }}
+                >
+                  <Icon
+                    aria-hidden="true"
+                    className="size-4 text-white"
+                  />
+                </motion.div>
+              </motion.div>
+
+              <div className="min-w-0">
+                <motion.h4
+                  initial={false}
+                  className="text-[0.96rem] font-semibold leading-tight"
+                  animate={{
+                    color: isActive
+                      ? "rgba(255,255,255,1)"
+                      : "rgba(255,255,255,0.68)",
+                  }}
+                  transition={{
+                    duration: 1.15,
+                    ease: [0.22, 1, 0.36, 1],
+                  }}
+                >
+                  {item.title}
+                </motion.h4>
+
+                <motion.p
+                  initial={false}
+                  className="mt-1 text-[0.65rem] leading-[1.32]"
+                  animate={{
+                    color: isActive
+                      ? "rgba(255,255,255,0.76)"
+                      : "rgba(255,255,255,0.38)",
+                  }}
+                  transition={{
+                    duration: 1.15,
+                    ease: [0.22, 1, 0.36, 1],
+                  }}
+                >
+                  {item.text}
+                </motion.p>
+              </div>
+            </motion.div>
           );
         })}
       </div>
@@ -389,16 +553,14 @@ function StackTags() {
 
   return (
     <div className="mt-4 flex flex-wrap gap-1.5">
-      {technologies.map(
-        (technology) => (
-          <span
-            key={technology}
-            className="rounded-full border border-white/12 bg-black/20 px-2.5 py-1 text-[0.57rem] font-medium text-white/72"
-          >
-            {technology}
-          </span>
-        ),
-      )}
+      {technologies.map((technology) => (
+        <span
+          key={technology}
+          className="rounded-full border border-white/12 bg-black/20 px-2.5 py-1 text-[0.57rem] font-medium text-white/72"
+        >
+          {technology}
+        </span>
+      ))}
     </div>
   );
 }
@@ -406,120 +568,94 @@ function StackTags() {
 export default function Three() {
   const { t } = useLanguage();
 
-  const developmentRef =
-    useRef<HTMLDivElement>(null);
+  const developmentRef = useRef<HTMLDivElement>(null);
+  const teachingRef = useRef<HTMLDivElement>(null);
 
-  const teachingRef =
-    useRef<HTMLDivElement>(null);
+  const developmentActive = useInView(
+    developmentRef,
+    { amount: 0.08 },
+  );
 
-  const developmentActive =
-    useInView(
-      developmentRef,
-      {
-        amount: 0.08,
-      },
-    );
+  const teachingActive = useInView(
+    teachingRef,
+    { amount: 0.38 },
+  );
 
-  const teachingActive =
-    useInView(
-      teachingRef,
-      {
-        amount: 0.08,
-      },
-    );
+  const webSlides: readonly MicroSlide[] = [
+    {
+      title: t.services.development.webItems[0].title,
+      text: t.services.development.webItems[0].text,
+      icon: PanelsTopLeft,
+    },
+    {
+      title: t.services.development.webItems[1].title,
+      text: t.services.development.webItems[1].text,
+      icon: ShoppingBag,
+    },
+    {
+      title: t.services.development.webItems[2].title,
+      text: t.services.development.webItems[2].text,
+      icon: MonitorSmartphone,
+    },
+  ];
 
-  const webSlides: readonly MicroSlide[] =
-    [
-      {
-        title:
-          t.services.development
-            .webItems[0].title,
-        text:
-          t.services.development
-            .webItems[0].text,
-        icon: PanelsTopLeft,
-      },
-      {
-        title:
-          t.services.development
-            .webItems[1].title,
-        text:
-          t.services.development
-            .webItems[1].text,
-        icon: ShoppingBag,
-      },
-      {
-        title:
-          t.services.development
-            .webItems[2].title,
-        text:
-          t.services.development
-            .webItems[2].text,
-        icon: MonitorSmartphone,
-      },
-    ];
+  const developmentCapabilities: readonly MicroSlide[] = [
+    {
+      title: t.services.development.capabilities[0].title,
+      text: t.services.development.capabilities[0].text,
+      icon: LayoutDashboard,
+    },
+    {
+      title: t.services.development.capabilities[1].title,
+      text: t.services.development.capabilities[1].text,
+      icon: Workflow,
+    },
+    {
+      title: t.services.development.capabilities[2].title,
+      text: t.services.development.capabilities[2].text,
+      icon: PlugZap,
+    },
+  ];
 
-  const developmentCapabilities: readonly MicroSlide[] =
-    [
-      {
-        title:
-          t.services.development
-            .capabilities[0].title,
-        text:
-          t.services.development
-            .capabilities[0].text,
-        icon: LayoutDashboard,
-      },
-      {
-        title:
-          t.services.development
-            .capabilities[1].title,
-        text:
-          t.services.development
-            .capabilities[1].text,
-        icon: Workflow,
-      },
-      {
-        title:
-          t.services.development
-            .capabilities[2].title,
-        text:
-          t.services.development
-            .capabilities[2].text,
-        icon: PlugZap,
-      },
-    ];
+  const classSlides: readonly MicroSlide[] = [
+    {
+      title: t.services.teaching.modalityItems[0].title,
+      text: t.services.teaching.modalityItems[0].text,
+      icon: UserRound,
+    },
+    {
+      title: t.services.teaching.modalityItems[1].title,
+      text: t.services.teaching.modalityItems[1].text,
+      icon: Video,
+    },
+    {
+      title: t.services.teaching.modalityItems[2].title,
+      text: t.services.teaching.modalityItems[2].text,
+      icon: Presentation,
+    },
+  ];
 
-  const classSlides: readonly MicroSlide[] =
-    [
-      {
-        title:
-          t.services.teaching
-            .modalityItems[0].title,
-        text:
-          t.services.teaching
-            .modalityItems[0].text,
-        icon: UserRound,
-      },
-      {
-        title:
-          t.services.teaching
-            .modalityItems[1].title,
-        text:
-          t.services.teaching
-            .modalityItems[1].text,
-        icon: Video,
-      },
-      {
-        title:
-          t.services.teaching
-            .modalityItems[2].title,
-        text:
-          t.services.teaching
-            .modalityItems[2].text,
-        icon: Presentation,
-      },
-    ];
+  const teachingProgress: readonly [
+    MicroSlide,
+    MicroSlide,
+    MicroSlide,
+  ] = [
+    {
+      title: t.services.teaching.progressItems[0].title,
+      text: t.services.teaching.progressItems[0].text,
+      icon: Lightbulb,
+    },
+    {
+      title: t.services.teaching.progressItems[1].title,
+      text: t.services.teaching.progressItems[1].text,
+      icon: Code2,
+    },
+    {
+      title: t.services.teaching.progressItems[2].title,
+      text: t.services.teaching.progressItems[2].text,
+      icon: Rocket,
+    },
+  ];
 
   const programmingVisuals = [
     "/images/services/programming-webs.jpg",
@@ -535,32 +671,20 @@ export default function Three() {
 
   return (
     <div className="w-full min-w-0">
-      <ServiceGroup
-        groupRef={
-          developmentRef
-        }
-      >
+      <ServiceGroup groupRef={developmentRef}>
         <MainCard
           image="/images/services/programming-main.jpg"
           index="01"
-          label={
-            t.services.development
-              .label
-          }
-          title={
-            t.services.development
-              .title
-          }
-          description={
-            t.services.development
-              .description
-          }
+          label={t.services.development.label}
+          title={t.services.development.title}
+          description={t.services.development.description}
           icon={
             <Code2
               aria-hidden="true"
               className="size-5"
             />
           }
+          active={developmentActive}
         >
           <StackTags />
         </MainCard>
@@ -574,6 +698,7 @@ export default function Three() {
 
         <CapabilityServiceCard
           items={developmentCapabilities}
+          active={developmentActive}
         />
       </ServiceGroup>
 
@@ -593,26 +718,22 @@ export default function Three() {
         <MainCard
           image="/images/services/classes-main.jpg"
           index="02"
-          label={
-            t.services.teaching.label
-          }
-          title={
-            t.services.teaching.title
-          }
-          description={
-            t.services.teaching
-              .description
-          }
+          label={t.services.teaching.label}
+          title={t.services.teaching.title}
+          description={t.services.teaching.description}
           icon={
             <GraduationCap
               aria-hidden="true"
               className="size-5"
             />
           }
+          active={teachingActive}
         />
 
-        <CapabilityServiceCard
-          items={classSlides}
+        <LearningProgressCard
+          items={teachingProgress}
+          active={teachingActive}
+          intervalMs={4200}
         />
 
         <VisualServiceCard
