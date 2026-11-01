@@ -1,25 +1,22 @@
 "use client";
 
 import Image from "next/image";
-import type { ReactNode } from "react";
 import {
+  Fragment,
   useEffect,
   useRef,
   useState,
+  type ReactNode,
 } from "react";
 
-import { LucideIcon, LayoutDashboard, Database, Workflow } from "lucide-react";
+import { LucideIcon, LayoutDashboard, Workflow } from "lucide-react";
 import {
-  AppWindow,
-  BookOpen,
-  Braces,
   Code2,
   GraduationCap,
   MonitorSmartphone,
   PanelsTopLeft,
   PlugZap,
   Presentation,
-  ServerCog,
   ShoppingBag,
   UserRound,
   Video,
@@ -40,12 +37,10 @@ type MicroSlide = {
   icon: LucideIcon;
 };
 
-type MicroCardProps = {
+type VisualServiceCardProps = {
   slides: readonly MicroSlide[];
   active: boolean;
-  className: string;
-  iconClassName: string;
-  visual?: "default" | "web";
+  images: readonly [string, ...string[]];
   intervalMs?: number;
 };
 
@@ -200,14 +195,12 @@ function MainCard({
   );
 }
 
-function MicroCard({
+function VisualServiceCard({
   slides,
   active,
-  className,
-  iconClassName,
-  visual = "default",
+  images,
   intervalMs = 3000,
-}: MicroCardProps) {
+}: VisualServiceCardProps) {
   const [activeIndex, setActiveIndex] =
     useState(0);
 
@@ -237,319 +230,148 @@ function MicroCard({
   const current =
     slides[activeIndex]!;
 
-  const Icon =
-    current.icon;
-
-  const visualItems = [
-    "/images/services/programming-webs.jpg",
-    "/images/services/programming-ecommerce.jpg",
-    "/images/services/programming-landing.jpg",
-  ] as const;
-
   const visualItem =
-    visualItems[activeIndex % visualItems.length];
+    images[activeIndex % images.length]!;
 
   return (
     <motion.article
       variants={cardVariants}
-      className={[
-        "service-mini-card relative overflow-hidden rounded-[1.55rem] border p-4",
-        className,
-      ].join(" ")}
+      className="service-mini-card relative overflow-hidden rounded-[1.55rem] border p-4 text-white"
     >
-      {visual === "web" ? (
-        <>
-          <div
-            aria-hidden="true"
-            className="absolute inset-0 bg-[var(--service-card-bg)]"
-          />
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 bg-[var(--service-card-bg)]"
+      />
 
-          <div className="absolute inset-x-0 top-0 h-[9.4rem] overflow-hidden">
-            <AnimatePresence initial={false}>
-              <motion.div
-                key={`image-${activeIndex}`}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{
-                  duration: 0.9,
-                  ease: "easeOut",
-                }}
-                className="absolute inset-0"
-              >
-                <div
-                  aria-hidden="true"
-                  className="absolute inset-0 bg-cover bg-center"
-                  style={{
-                    backgroundImage: `url('${visualItem}')`,
-                  }}
-                />
-              </motion.div>
-            </AnimatePresence>
-
+      <div className="absolute inset-x-0 top-0 h-[9.4rem] overflow-hidden">
+        <AnimatePresence initial={false}>
+          <motion.div
+            key={visualItem}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{
+              duration: 0.9,
+              ease: "easeOut",
+            }}
+            className="absolute inset-0"
+          >
             <div
               aria-hidden="true"
-              className="service-mini-card-fade absolute inset-0"
+              className="absolute inset-0 bg-cover bg-center"
+              style={{
+                backgroundImage: `url('${visualItem}')`,
+              }}
             />
+          </motion.div>
+        </AnimatePresence>
+
+        <div
+          aria-hidden="true"
+          className="service-mini-card-fade absolute inset-0"
+        />
+      </div>
+
+      <div className="relative z-10 flex h-full flex-col">
+        <div className="flex items-center justify-end">
+          <div className="flex gap-1">
+            {slides.map((_, index) => (
+              <span
+                key={index}
+                className={[
+                  "h-1 rounded-full transition-all duration-300",
+                  index === activeIndex
+                    ? "w-4 bg-white/70"
+                    : "w-1 bg-white/20",
+                ].join(" ")}
+              />
+            ))}
           </div>
+        </div>
 
-          <div className="relative z-10 flex h-full flex-col">
-            <div className="flex items-center justify-end">
-              <div className="flex gap-1">
-                {slides.map((_, index) => (
-                  <span
-                    key={index}
-                    className={[
-                      "h-1 rounded-full transition-all duration-300",
-                      index === activeIndex
-                        ? "w-4 bg-white/70"
-                        : "w-1 bg-white/20",
-                    ].join(" ")}
-                  />
-                ))}
-              </div>
-            </div>
-
-            <div className="mt-auto h-[5.6rem]">
-              <AnimatePresence mode="wait" initial={false}>
-                <motion.div
-                  key={activeIndex}
-                  initial={{ opacity: 0, y: 7 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -5 }}
-                  transition={{
-                    duration: 0.4,
-                    ease: [0.22, 1, 0.36, 1],
-                  }}
-                >
-                  <h4 className="text-[1.12rem] font-semibold leading-tight tracking-[-0.035em] text-white">
-                    {current.title}
-                  </h4>
-
-                  <p className="mt-1.5 text-[0.73rem] leading-[1.45] text-white/70">
-                    {current.text}
-                  </p>
-                </motion.div>
-              </AnimatePresence>
-            </div>
-          </div>
-        </>
-      ) : (
-        <>
-          <div
-            aria-hidden="true"
-            className="absolute -right-8 -top-8 size-28 rounded-full bg-white/7"
-          />
-
-          <div className="relative z-10 flex min-h-[10.5rem] flex-col justify-between">
-            <div className="flex items-start justify-between gap-3">
-              <AnimatePresence
-                mode="wait"
-                initial={false}
-              >
-                <motion.div
-                  key={`icon-${activeIndex}`}
-                  initial={{
-                    opacity: 0,
-                    y: 5,
-                  }}
-                  animate={{
-                    opacity: 1,
-                    y: 0,
-                  }}
-                  exit={{
-                    opacity: 0,
-                    y: -4,
-                  }}
-                  transition={{
-                    duration: 0.32,
-                    ease: [0.22, 1, 0.36, 1],
-                  }}
-                >
-                  <Icon
-                    aria-hidden="true"
-                    className={[
-                      "size-7",
-                      iconClassName,
-                    ].join(" ")}
-                  />
-                </motion.div>
-              </AnimatePresence>
-
-              <div className="flex gap-1">
-                {slides.map(
-                  (_, index) => (
-                    <span
-                      key={index}
-                      className={[
-                        "h-1 rounded-full transition-all duration-300",
-                        index === activeIndex
-                          ? "w-4 bg-white/65"
-                          : "w-1 bg-white/20",
-                      ].join(" ")}
-                    />
-                  ),
-                )}
-              </div>
-            </div>
-
-            <AnimatePresence
-              mode="wait"
-              initial={false}
+        <div className="mt-auto flex min-h-[5.6rem] items-end">
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={activeIndex}
+              initial={{ opacity: 0, y: 7 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -5 }}
+              transition={{
+                duration: 0.4,
+                ease: [0.22, 1, 0.36, 1],
+              }}
+              className="w-full"
             >
-              <motion.div
-                key={activeIndex}
-                initial={{
-                  opacity: 0,
-                  y: 7,
-                }}
-                animate={{
-                  opacity: 1,
-                  y: 0,
-                }}
-                exit={{
-                  opacity: 0,
-                  y: -5,
-                }}
-                transition={{
-                  duration: 0.34,
-                  ease: [0.22, 1, 0.36, 1],
-                }}
-              >
-                <h4 className="text-[1.05rem] font-semibold leading-tight tracking-[-0.035em]">
-                  {current.title}
-                </h4>
+              <h4 className="text-[1.12rem] font-semibold leading-tight tracking-[-0.035em] text-white">
+                {current.title}
+              </h4>
 
-                <p className="mt-1.5 text-[0.67rem] leading-[1.45] text-white/62">
-                  {current.text}
-                </p>
-              </motion.div>
-            </AnimatePresence>
-          </div>
-        </>
-      )}
+              <p className="mt-1.5 text-[0.73rem] leading-[1.45] text-white/70">
+                {current.text}
+              </p>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </div>
     </motion.article>
   );
 }
 
-function TechnologyCard({
-  active,
-  label,
+function CapabilityServiceCard({
+  items,
 }: {
-  active: boolean;
-  label: string;
+  items: readonly MicroSlide[];
 }) {
-  const technologies = [
-    "Python",
-    "Java",
-    "C",
-    "C#",
-    "JavaScript",
-    "Go",
-  ] as const;
-
-  const shortName: Record<
-    (typeof technologies)[number],
-    string
-  > = {
-    Python: "Py",
-    Java: "J",
-    C: "C",
-    "C#": "C#",
-    JavaScript: "JS",
-    Go: "Go",
-  };
-
-  const [activeIndex, setActiveIndex] =
-    useState(0);
-
-  useEffect(() => {
-    if (!active) {
-      return;
-    }
-
-    const interval =
-      window.setInterval(() => {
-        setActiveIndex(
-          (current) =>
-            (current + 1) %
-            technologies.length,
-        );
-      }, 2200);
-
-    return () =>
-      window.clearInterval(
-        interval,
-      );
-  }, [active, technologies.length]);
-
-  const technology =
-    technologies[activeIndex];
-
   return (
     <motion.article
       variants={cardVariants}
-      className="relative overflow-hidden rounded-[1.55rem] border border-white/8 bg-[radial-gradient(circle_at_18%_12%,rgba(255,255,255,0.055),transparent_32%),radial-gradient(circle_at_85%_82%,rgba(255,255,255,0.025),transparent_38%),linear-gradient(145deg,#101010_0%,#171717_55%,#1c1c1c_100%)] p-5 text-white"
+      className="service-mini-card service-mini-card--textured relative overflow-hidden rounded-[1.55rem] border p-5 text-white"
     >
-      <div
-        aria-hidden="true"
-        className="absolute -right-8 -top-8 size-32 rounded-full bg-[#a97ac0]/18"
-      />
+      <div className="relative z-10 flex h-full flex-col justify-between">
+        {items.map((item, index) => {
+          const Icon = item.icon;
 
-      <div className="relative z-10 flex min-h-[10.5rem] flex-col">
-        <div className="flex items-start justify-between gap-3">
-          <BookOpen
-            aria-hidden="true"
-            className="size-7 text-[#d5a8e8]"
-          />
+          return (
+            <Fragment key={item.title}>
+              <div className="flex items-center gap-3">
+                <div className="service-mini-card-icon flex size-9 shrink-0 items-center justify-center rounded-full border">
+                  <Icon
+                    aria-hidden="true"
+                    className="size-4 text-white/70"
+                  />
+                </div>
 
-          <span className="text-[0.52rem] font-semibold uppercase tracking-[0.12em] text-white/40">
-            {label}
-          </span>
-        </div>
+                <div>
+                  <h4 className="text-[0.95rem] font-semibold leading-tight">
+                    {item.title}
+                  </h4>
 
-        <div className="mt-auto">
-          <AnimatePresence
-            mode="wait"
-            initial={false}
-          >
-            <motion.div
-              key={technology}
-              initial={{
-                opacity: 0,
-                y: 7,
-              }}
-              animate={{
-                opacity: 1,
-                y: 0,
-              }}
-              exit={{
-                opacity: 0,
-                y: -5,
-              }}
-              transition={{
-                duration: 0.34,
-                ease: [0.22, 1, 0.36, 1],
-              }}
-              className="flex items-end justify-between gap-3"
-            >
-              <div>
-                <span className="block text-[2rem] font-semibold leading-none tracking-[-0.06em]">
-                  {shortName[technology]}
-                </span>
-
-                <span className="mt-2 block text-[0.69rem] font-medium text-white/68">
-                  {technology}
-                </span>
+                  <p className="mt-1 text-[0.66rem] leading-[1.35] text-white/55">
+                    {item.text}
+                  </p>
+                </div>
               </div>
 
-              <Braces
-                aria-hidden="true"
-                className="mb-0.5 size-5 text-white/26"
-              />
-            </motion.div>
-          </AnimatePresence>
-        </div>
+              {index < items.length - 1 ? (
+                <div className="relative ml-[1.1rem] h-5 w-px bg-white/12">
+                  <motion.span
+                    aria-hidden="true"
+                    className="absolute left-1/2 top-0 size-1 -translate-x-1/2 rounded-full bg-white/60"
+                    animate={{
+                      y: [0, 18],
+                      opacity: [0, 1, 0],
+                    }}
+                    transition={{
+                      duration: 2.6,
+                      repeat: Infinity,
+                      ease: "linear",
+                    }}
+                  />
+                </div>
+              ) : null}
+            </Fragment>
+          );
+        })}
       </div>
     </motion.article>
   );
@@ -637,33 +459,33 @@ export default function Three() {
       },
     ];
 
-  const appSlides: readonly MicroSlide[] =
+  const developmentCapabilities: readonly MicroSlide[] =
     [
       {
         title:
           t.services.development
-            .appItems[0].title,
+            .capabilities[0].title,
         text:
           t.services.development
-            .appItems[0].text,
-        icon: AppWindow,
+            .capabilities[0].text,
+        icon: LayoutDashboard,
       },
       {
         title:
           t.services.development
-            .appItems[1].title,
+            .capabilities[1].title,
         text:
           t.services.development
-            .appItems[1].text,
-        icon: ServerCog,
+            .capabilities[1].text,
+        icon: Workflow,
       },
       {
         title:
           t.services.development
-            .appItems[2].title,
+            .capabilities[2].title,
         text:
           t.services.development
-            .appItems[2].text,
+            .capabilities[2].text,
         icon: PlugZap,
       },
     ];
@@ -699,6 +521,18 @@ export default function Three() {
       },
     ];
 
+  const programmingVisuals = [
+    "/images/services/programming-webs.jpg",
+    "/images/services/programming-ecommerce.jpg",
+    "/images/services/programming-landing.jpg",
+  ] as const;
+
+  const teachingVisuals = [
+    "/images/services/classes-online.png",
+    "/images/services/classes-followup.png",
+    "/images/services/classes-exercises.png",
+  ] as const;
+
   return (
     <div className="w-full min-w-0">
       <ServiceGroup
@@ -731,110 +565,16 @@ export default function Three() {
           <StackTags />
         </MainCard>
 
-        <MicroCard
+        <VisualServiceCard
           slides={webSlides}
           active={developmentActive}
-          visual="web"
+          images={programmingVisuals}
           intervalMs={3600}
-          className="text-white"
-          iconClassName="text-[#aab5ff]"
         />
 
-        <motion.article
-          variants={cardVariants}
-          className="service-mini-card service-mini-card--textured relative overflow-hidden rounded-[1.55rem] border p-5 text-white"
-        >
-          <div className="relative z-10 flex h-full flex-col justify-between">
-            <div className="flex items-center gap-3">
-              <div className="service-mini-card-icon flex size-9 shrink-0 items-center justify-center rounded-full border">
-                <LayoutDashboard
-                  aria-hidden="true"
-                  className="size-4 text-white/70"
-                />
-              </div>
-
-              <div>
-                <h4 className="text-[0.95rem] font-semibold leading-tight">
-                  {t.services.development.capabilities[0].title}
-                </h4>
-
-                <p className="mt-1 text-[0.66rem] leading-[1.35] text-white/55">
-                  {t.services.development.capabilities[0].text}
-                </p>
-              </div>
-            </div>
-
-            <div className="relative ml-[1.1rem] h-5 w-px bg-white/12">
-              <motion.span
-                aria-hidden="true"
-                className="absolute left-1/2 top-0 size-1 -translate-x-1/2 rounded-full bg-white/60"
-                animate={{
-                  y: [0, 18],
-                  opacity: [0, 1, 0],
-                }}
-                transition={{
-                  duration: 2.6,
-                  repeat: Infinity,
-                  ease: "linear",
-                }}
-              />
-            </div>
-
-            <div className="flex items-center gap-3">
-              <div className="service-mini-card-icon flex size-9 shrink-0 items-center justify-center rounded-full border">
-                <Workflow
-                  aria-hidden="true"
-                  className="size-4 text-white/70"
-                />
-              </div>
-
-              <div>
-                <h4 className="text-[0.95rem] font-semibold leading-tight">
-                  {t.services.development.capabilities[1].title}
-                </h4>
-
-                <p className="mt-1 text-[0.66rem] leading-[1.35] text-white/55">
-                  {t.services.development.capabilities[1].text}
-                </p>
-              </div>
-            </div>
-
-            <div className="relative ml-[1.1rem] h-5 w-px bg-white/12">
-              <motion.span
-                aria-hidden="true"
-                className="absolute left-1/2 top-0 size-1 -translate-x-1/2 rounded-full bg-white/60"
-                animate={{
-                  y: [0, 18],
-                  opacity: [0, 1, 0],
-                }}
-                transition={{
-                  duration: 2.6,
-                  repeat: Infinity,
-                  ease: "linear",
-                }}
-              />
-            </div>
-
-            <div className="flex items-center gap-3">
-              <div className="service-mini-card-icon flex size-9 shrink-0 items-center justify-center rounded-full border">
-                <PlugZap
-                  aria-hidden="true"
-                  className="size-4 text-white/70"
-                />
-              </div>
-
-              <div>
-                <h4 className="text-[0.95rem] font-semibold leading-tight">
-                  {t.services.development.capabilities[2].title}
-                </h4>
-
-                <p className="mt-1 text-[0.66rem] leading-[1.35] text-white/55">
-                  {t.services.development.capabilities[2].text}
-                </p>
-              </div>
-            </div>
-          </div>
-        </motion.article>
+        <CapabilityServiceCard
+          items={developmentCapabilities}
+        />
       </ServiceGroup>
 
       <div
@@ -871,19 +611,15 @@ export default function Three() {
           }
         />
 
-        <MicroCard
-          slides={classSlides}
-          active={teachingActive}
-          className="bg-[#4a3933] text-[#fff5f0]"
-          iconClassName="text-[#efb99f]"
+        <CapabilityServiceCard
+          items={classSlides}
         />
 
-        <TechnologyCard
+        <VisualServiceCard
+          slides={classSlides}
           active={teachingActive}
-          label={
-            t.services.teaching
-              .technologiesTitle
-          }
+          images={teachingVisuals}
+          intervalMs={4200}
         />
       </ServiceGroup>
     </div>
