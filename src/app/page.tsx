@@ -1,5 +1,6 @@
 import { GlobalEffects } from "@/components/effects/GlobalEffects";
 
+import { Footer } from "@/components/sections/Footer";
 import { Hero } from "@/components/sections/Hero";
 import { OtherWork } from "@/components/sections/OtherWork";
 import { SelectedWork } from "@/components/sections/SelectedWork";
@@ -18,8 +19,9 @@ export default function Home() {
       <Hero />
       <SelectedWork />
       <OtherWork />
-      <Services />      
+      <Services />
       <TestimonialsContact />
+      <Footer />
     </>
   );
 }

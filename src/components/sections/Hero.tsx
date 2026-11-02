@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 
 import AnimatedGradientText from "@/components/animata/text/animated-gradient-text";
 import BlurOutUp from "@/components/animata/text/blur-out-up";
-import GibberishText from "@/components/animata/text/gibberish-text";
 import PerCharacterRise from "@/components/animata/text/per-character-rise";
+import { AnimatedName } from "@/components/ui/AnimatedName";
 import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
 import { useLanguage } from "@/i18n/LanguageProvider";
 
@@ -26,10 +26,9 @@ function HeroHeadline({
     useState(false);
 
   useEffect(() => {
-    const timeout =
-      window.setTimeout(() => {
-        setShowHeadlineGradient(true);
-      }, HEADLINE_GRADIENT_DELAY);
+    const timeout = window.setTimeout(() => {
+      setShowHeadlineGradient(true);
+    }, HEADLINE_GRADIENT_DELAY);
 
     return () =>
       window.clearTimeout(timeout);
@@ -97,13 +96,7 @@ export function Hero() {
         <LanguageSwitcher />
 
         <div className="hero-topbar hero-reveal">
-          <div className="hero-name">
-            <GibberishText
-              text="Sebastián Villegas"
-              intervalMs={65}
-              pauseMs={5000}
-            />
-          </div>
+          <AnimatedName />
 
           <div className="hero-roles">
             <BlurOutUp
