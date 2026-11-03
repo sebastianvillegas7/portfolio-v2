@@ -1,7 +1,10 @@
 "use client";
 
+import { motion, useReducedMotion } from "motion/react";
+
 import { useLanguage } from "@/i18n/LanguageProvider";
 import type { Language } from "@/i18n/translations";
+import { cn } from "@/lib/utils";
 
 const LANGUAGES: Language[] = ["es", "en"];
 
@@ -12,46 +15,55 @@ export function LanguageSwitcher() {
     t,
   } = useLanguage();
 
+  const reduceMotion = useReducedMotion();
+
   return (
     <div
-      className="absolute right-[var(--page-padding-x)] top-[3.35rem] z-20 flex items-center gap-1 rounded-full border border-border/60 bg-background/55 p-1 shadow-sm backdrop-blur-md"
+      role="group"
       aria-label={t.language.selectorLabel}
+      className="relative inline-flex shrink-0 items-center rounded-full border border-white/10 bg-background/55 p-0.5 shadow-sm backdrop-blur-md"
     >
-      {LANGUAGES.map(
-        (option, index) => (
-          <div
-            key={option}
-            className="flex items-center gap-1"
-          >
-            {index > 0 && (
-              <span
-                aria-hidden="true"
-                className="text-[0.55rem] text-foreground-subtle"
-              >
-                /
-              </span>
-            )}
+      {LANGUAGES.map((option) => {
+        const selected =
+          language === option;
 
-            <button
-              type="button"
-              onClick={() =>
-                setLanguage(option)
-              }
-              aria-pressed={
-                language === option
-              }
-              className={[
-                "rounded-full px-2 py-1 text-[0.58rem] font-medium uppercase tracking-[0.12em] transition-colors",
-                language === option
-                  ? "bg-foreground text-background"
-                  : "text-foreground-muted hover:text-foreground",
-              ].join(" ")}
-            >
-              {option}
-            </button>
-          </div>
-        ),
-      )}
+        return (
+          <button
+            key={option}
+            type="button"
+            onClick={() =>
+              setLanguage(option)
+            }
+            aria-pressed={selected}
+            className={cn(
+              "relative isolate flex h-8 min-w-10 items-center justify-center rounded-full px-2 text-[0.6rem] font-semibold uppercase tracking-[0.1em] transition-colors duration-200",
+              selected
+                ? "text-background"
+                : "text-foreground-muted hover:text-foreground",
+            )}
+          >
+            {selected ? (
+              <motion.span
+                layoutId="language-switcher-active"
+                aria-hidden="true"
+                className="absolute inset-0 -z-10 rounded-full bg-foreground"
+                transition={
+                  reduceMotion
+                    ? { duration: 0 }
+                    : {
+                        type: "spring",
+                        stiffness: 420,
+                        damping: 34,
+                        mass: 0.45,
+                      }
+                }
+              />
+            ) : null}
+
+            {option}
+          </button>
+        );
+      })}
     </div>
   );
 }

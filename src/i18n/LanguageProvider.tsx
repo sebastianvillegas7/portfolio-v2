@@ -9,26 +9,53 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { flushSync } from "react-dom";
 
 import {
   translations,
   type Language,
 } from "@/i18n/translations";
 
-const LANGUAGE_STORAGE_KEY = "portfolio-language";
+const LANGUAGE_STORAGE_KEY =
+  "portfolio-language";
 
 type LanguageContextValue = {
   language: Language;
-  setLanguage: (language: Language) => void;
+  setLanguage: (
+    language: Language,
+  ) => void;
   t: (typeof translations)[Language];
 };
 
 const LanguageContext =
-  createContext<LanguageContextValue | null>(null);
+  createContext<LanguageContextValue | null>(
+    null,
+  );
 
 type LanguageProviderProps = {
   children: ReactNode;
 };
+
+type ViewTransitionDocument =
+  Document & {
+    startViewTransition?: (
+      update: () => void,
+    ) => {
+      finished: Promise<void>;
+    };
+  };
+
+function syncDocumentLanguage(
+  language: Language,
+) {
+  document.documentElement.lang =
+    language;
+
+  window.localStorage.setItem(
+    LANGUAGE_STORAGE_KEY,
+    language,
+  );
+}
 
 export function LanguageProvider({
   children,
@@ -62,17 +89,41 @@ export function LanguageProvider({
 
   const setLanguage = useCallback(
     (nextLanguage: Language) => {
-      setLanguageState(nextLanguage);
+      if (nextLanguage === language) {
+        return;
+      }
 
-      document.documentElement.lang =
-        nextLanguage;
+      const commitLanguage = () => {
+        flushSync(() => {
+          setLanguageState(nextLanguage);
+        });
 
-      window.localStorage.setItem(
-        LANGUAGE_STORAGE_KEY,
-        nextLanguage,
+        syncDocumentLanguage(
+          nextLanguage,
+        );
+      };
+
+      const transitionDocument =
+        document as ViewTransitionDocument;
+
+      const reduceMotion =
+        window.matchMedia(
+          "(prefers-reduced-motion: reduce)",
+        ).matches;
+
+      if (
+        reduceMotion ||
+        !transitionDocument.startViewTransition
+      ) {
+        commitLanguage();
+        return;
+      }
+
+      transitionDocument.startViewTransition(
+        commitLanguage,
       );
     },
-    [],
+    [language],
   );
 
   const value = useMemo(
@@ -85,7 +136,9 @@ export function LanguageProvider({
   );
 
   return (
-    <LanguageContext.Provider value={value}>
+    <LanguageContext.Provider
+      value={value}
+    >
       {children}
     </LanguageContext.Provider>
   );
