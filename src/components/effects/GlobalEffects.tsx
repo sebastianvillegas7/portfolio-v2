@@ -1,212 +1,322 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 import FluidCursor from "@/components/effects/FluidCursor";
 import { GlobalLight } from "@/components/effects/GlobalLight";
 import { globalPerformanceState } from "@/components/effects/global-performance-state";
 
 const RESUME_GAP_PX = 48;
+
 const FLUID_SUSPEND_Y_PX = 96;
 const FLUID_RESUME_Y_PX = 144;
-const FLUID_MASK_FADE_PX = 72;
+
+/*
+ * Mientras Selected Work todavía está lejos
+ * del punto sticky, no necesitamos medir
+ * continuamente la escena.
+ */
+const STICKY_CHECK_DISTANCE_PX = 240;
 
 export function GlobalEffects() {
-  const [fluidHidden, setFluidHidden] = useState(false);
-  const [heroLightMounted, setHeroLightMounted] = useState(true);
+  const [fluidHidden, setFluidHidden] =
+    useState(false);
 
-  const suspendedRef = useRef(false);
-  const fluidSuspendedRef = useRef(false);
-  const heroLightMountedRef = useRef(true);
+  const suspendedRef =
+    useRef(false);
 
-  const frameRef = useRef<number | null>(null);
-  const fluidClipRef = useRef<HTMLDivElement>(null);
-  const lastMaskRef = useRef<string | null>(null);
+  const fluidSuspendedRef =
+    useRef(false);
+
+  const frameRef =
+    useRef<number | null>(null);
+
+  const fluidRef =
+    useRef<HTMLDivElement>(null);
+
+  const heroLightRef =
+    useRef<HTMLDivElement>(null);
+
+  const lastLightOpacityRef =
+    useRef<number | null>(null);
+
+  const lastFluidOpacityRef =
+    useRef<number | null>(null);
 
   useEffect(() => {
-    const setHeroLightState = (mounted: boolean) => {
-      if (heroLightMountedRef.current === mounted) {
-        return;
-      }
-
-      heroLightMountedRef.current = mounted;
-      setHeroLightMounted(mounted);
-    };
-
-    const applyFluidMask = (mask: string) => {
-      const element = fluidClipRef.current;
-
-      if (
-        !element ||
-        lastMaskRef.current === mask
-      ) {
-        return;
-      }
-
-      lastMaskRef.current = mask;
-      element.style.maskImage = mask;
-      element.style.webkitMaskImage = mask;
-    };
-
-    const updateFluidMask = (
-      titleTop: number | null,
-    ) => {
-      if (titleTop === null) {
-        applyFluidMask("none");
-        return;
-      }
-
-      if (
-        titleTop >=
-        window.innerHeight +
-          FLUID_MASK_FADE_PX
-      ) {
-        applyFluidMask("none");
-        return;
-      }
-
-      const cutoffY = Math.max(
-        0,
-        Math.min(
-          window.innerHeight,
-          titleTop,
-        ),
+    /*
+     * Estos elementos no cambian durante
+     * la vida de la página.
+     *
+     * Antes los buscábamos en cada frame
+     * de scroll.
+     */
+    const selectedWorkTitle =
+      document.getElementById(
+        "selected-work-title",
       );
 
-      const fadeStart = Math.max(
-        0,
-        cutoffY -
-          FLUID_MASK_FADE_PX,
+    const scene =
+      document.querySelector<HTMLElement>(
+        "#work .project-sticky-scene",
       );
 
-      const mask = `linear-gradient(
-        to bottom,
-        black 0px,
-        black ${fadeStart}px,
-        transparent ${cutoffY}px,
-        transparent 100%
-      )`;
+    let stickyTop = 0;
 
-      applyFluidMask(mask);
-    };
-
-    const pauseFluid = () => {
-      if (fluidSuspendedRef.current) {
+    const updateStickyTop = () => {
+      if (!scene) {
+        stickyTop = 0;
         return;
       }
 
-      fluidSuspendedRef.current = true;
-      setFluidHidden(true);
-
-      window.dispatchEvent(
-        new Event("fluid-cursor:pause"),
-      );
-    };
-
-    const resumeFluid = () => {
-      if (!fluidSuspendedRef.current) {
-        return;
-      }
-
-      fluidSuspendedRef.current = false;
-      setFluidHidden(false);
-
-      window.dispatchEvent(
-        new Event("fluid-cursor:resume"),
-      );
-    };
-
-    const suspendEffects = () => {
-      if (suspendedRef.current) {
-        return;
-      }
-
-      suspendedRef.current = true;
-      globalPerformanceState.isScrolling = true;
-    };
-
-    const resumeEffects = () => {
-      if (!suspendedRef.current) {
-        return;
-      }
-
-      suspendedRef.current = false;
-      globalPerformanceState.isScrolling = false;
-    };
-
-    const updateEffectsState = () => {
-      frameRef.current = null;
-
-      const selectedWorkTitle =
-        document.getElementById(
-          "selected-work-title",
-        );
-
-      const scene =
-        document.querySelector<HTMLElement>(
-          "#work .project-sticky-scene",
-        );
-
-      if (
-        !selectedWorkTitle ||
-        !scene
-      ) {
-        updateFluidMask(null);
-        setHeroLightState(true);
-        resumeFluid();
-        resumeEffects();
-        return;
-      }
-
-      const titleRect =
-        selectedWorkTitle.getBoundingClientRect();
-
-      /*
-       * LightRays existe exclusivamente en Hero.
-       *
-       * En cuanto el heading de Selected Work
-       * empieza a entrar en pantalla, desmontamos
-       * completamente el segundo WebGL.
-       */
-      setHeroLightState(
-        titleRect.top >
-          window.innerHeight,
-      );
-
-      updateFluidMask(
-        titleRect.top,
-      );
-
-      if (
-        !fluidSuspendedRef.current &&
-        titleRect.top <=
-          FLUID_SUSPEND_Y_PX
-      ) {
-        pauseFluid();
-      } else if (
-        fluidSuspendedRef.current &&
-        titleRect.top >
-          FLUID_RESUME_Y_PX
-      ) {
-        resumeFluid();
-      }
-
-      const sceneRect =
-        scene.getBoundingClientRect();
-
-      const stickyTop =
+      stickyTop =
         Number.parseFloat(
           window.getComputedStyle(
             scene,
           ).top,
         ) || 0;
+    };
+
+    updateStickyTop();
+
+    const applyHeroLightOpacity = (
+      titleTop: number | null,
+    ) => {
+      const element =
+        heroLightRef.current;
+
+      if (!element) {
+        return;
+      }
+
+      let opacity = 1;
+
+      if (titleTop !== null) {
+        const fadeStart =
+          window.innerHeight * 1.05;
+
+        const fadeEnd =
+          window.innerHeight * 0.42;
+
+        opacity =
+          (titleTop - fadeEnd) /
+          (fadeStart - fadeEnd);
+
+        opacity = Math.max(
+          0,
+          Math.min(1, opacity),
+        );
+      }
+
+      if (
+        lastLightOpacityRef.current !== null &&
+        Math.abs(
+          lastLightOpacityRef.current -
+            opacity,
+        ) < 0.01
+      ) {
+        return;
+      }
+
+      lastLightOpacityRef.current =
+        opacity;
+
+      element.style.opacity =
+        opacity.toFixed(3);
+    };
+
+    const applyFluidOpacity = (
+      titleTop: number | null,
+    ) => {
+      const element =
+        fluidRef.current;
+
+      if (!element) {
+        return;
+      }
+
+      let opacity = 1;
+
+      if (titleTop !== null) {
+        /*
+         * Mantiene el fluido visible durante
+         * casi toda la transición Hero ->
+         * Selected Work.
+         */
+        const fadeStart =
+          window.innerHeight * 0.92;
+
+        const fadeEnd =
+          window.innerHeight * 0.28;
+
+        opacity =
+          (titleTop - fadeEnd) /
+          (fadeStart - fadeEnd);
+
+        opacity = Math.max(
+          0,
+          Math.min(1, opacity),
+        );
+      }
+
+      if (
+        lastFluidOpacityRef.current !== null &&
+        Math.abs(
+          lastFluidOpacityRef.current -
+            opacity,
+        ) < 0.01
+      ) {
+        return;
+      }
+
+      lastFluidOpacityRef.current =
+        opacity;
+
+      element.style.opacity =
+        opacity.toFixed(3);
+    };
+
+    const pauseFluid = () => {
+      if (
+        fluidSuspendedRef.current
+      ) {
+        return;
+      }
+
+      fluidSuspendedRef.current =
+        true;
+
+      setFluidHidden(true);
+
+      window.dispatchEvent(
+        new Event(
+          "fluid-cursor:pause",
+        ),
+      );
+    };
+
+    const resumeFluid = () => {
+      if (
+        !fluidSuspendedRef.current
+      ) {
+        return;
+      }
+
+      fluidSuspendedRef.current =
+        false;
+
+      setFluidHidden(false);
+
+      window.dispatchEvent(
+        new Event(
+          "fluid-cursor:resume",
+        ),
+      );
+    };
+
+    const suspendEffects = () => {
+      if (
+        suspendedRef.current
+      ) {
+        return;
+      }
+
+      suspendedRef.current =
+        true;
+
+      globalPerformanceState.isScrolling =
+        true;
+    };
+
+    const resumeEffects = () => {
+      if (
+        !suspendedRef.current
+      ) {
+        return;
+      }
+
+      suspendedRef.current =
+        false;
+
+      globalPerformanceState.isScrolling =
+        false;
+    };
+
+    const updateEffectsState = () => {
+      frameRef.current = null;
+
+      if (
+        !selectedWorkTitle ||
+        !scene
+      ) {
+        applyHeroLightOpacity(null);
+        applyFluidOpacity(null);
+
+        resumeFluid();
+        resumeEffects();
+
+        return;
+      }
+
+      /*
+       * Esta lectura sí necesitamos hacerla
+       * durante el scroll porque controla
+       * los fades del light y del fluid.
+       */
+      const titleRect =
+        selectedWorkTitle.getBoundingClientRect();
+
+      const titleTop =
+        titleRect.top;
+
+      applyHeroLightOpacity(
+        titleTop,
+      );
+
+      applyFluidOpacity(
+        titleTop,
+      );
+
+      if (
+        !fluidSuspendedRef.current &&
+        titleTop <=
+          FLUID_SUSPEND_Y_PX
+      ) {
+        pauseFluid();
+      } else if (
+        fluidSuspendedRef.current &&
+        titleTop >
+          FLUID_RESUME_Y_PX
+      ) {
+        resumeFluid();
+      }
+
+      /*
+       * Mientras Selected Work todavía está
+       * lejos del sticky point, no hacemos
+       * ninguna medición adicional.
+       */
+      if (
+        !suspendedRef.current &&
+        titleTop >
+          STICKY_CHECK_DISTANCE_PX
+      ) {
+        return;
+      }
+
+      const sceneTop =
+        scene.getBoundingClientRect().top;
 
       const reachedStickyPoint =
-        sceneRect.top <=
+        sceneTop <=
         stickyTop + 1;
 
       const leftStickyPoint =
-        sceneRect.top >
+        sceneTop >
         stickyTop +
           RESUME_GAP_PX;
 
@@ -215,6 +325,7 @@ export function GlobalEffects() {
         reachedStickyPoint
       ) {
         suspendEffects();
+
         return;
       }
 
@@ -239,6 +350,11 @@ export function GlobalEffects() {
         );
     };
 
+    const handleResize = () => {
+      updateStickyTop();
+      scheduleUpdate();
+    };
+
     const handleVisibilityChange =
       () => {
         globalPerformanceState.isDocumentVisible =
@@ -258,7 +374,7 @@ export function GlobalEffects() {
 
     window.addEventListener(
       "resize",
-      scheduleUpdate,
+      handleResize,
     );
 
     document.addEventListener(
@@ -274,7 +390,7 @@ export function GlobalEffects() {
 
       window.removeEventListener(
         "resize",
-        scheduleUpdate,
+        handleResize,
       );
 
       document.removeEventListener(
@@ -305,18 +421,22 @@ export function GlobalEffects() {
 
   return (
     <div className="absolute inset-0">
-      {heroLightMounted && (
-        <div className="absolute inset-0">
-          <GlobalLight />
-        </div>
-      )}
-
       <div
-        ref={fluidClipRef}
+        ref={heroLightRef}
         className="absolute inset-0"
         style={{
-          maskImage: "none",
-          WebkitMaskImage: "none",
+          opacity: 1,
+        }}
+      >
+        <GlobalLight />
+      </div>
+
+      <div
+        ref={fluidRef}
+        className="absolute inset-0"
+        style={{
+          opacity: 1,
+
           visibility:
             fluidHidden
               ? "hidden"

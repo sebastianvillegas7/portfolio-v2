@@ -1189,11 +1189,52 @@ const useFluidCursor = () => {
   }
 
   function splatPointer(pointer) {
-    const dx = pointer.deltaX * config.SPLAT_FORCE;
+    let dx =
+      pointer.deltaX *
+      config.SPLAT_FORCE;
 
-    const dy = pointer.deltaY * config.SPLAT_FORCE;
+    let dy =
+      pointer.deltaY *
+      config.SPLAT_FORCE;
 
-    splat(pointer.texcoordX, pointer.texcoordY, dx, dy, pointer.color);
+    let color = pointer.color;
+
+    const isTouch =
+      isMobile &&
+      pointer.id !== -1;
+
+    const isVerticalGesture =
+      Math.abs(pointer.deltaY) >
+      Math.abs(pointer.deltaX);
+
+    if (
+      isTouch &&
+      isVerticalGesture
+    ) {
+      /*
+      * Los swipes verticales de scroll suelen
+      * ser mucho más cortos que un gesto
+      * horizontal deliberado.
+      *
+      * Los reforzamos sin generar splats extra.
+      */
+      dx *= 1.25;
+      dy *= 1.8;
+
+      color = {
+        r: pointer.color.r * 1.4,
+        g: pointer.color.g * 1.4,
+        b: pointer.color.b * 1.4,
+      };
+    }
+
+    splat(
+      pointer.texcoordX,
+      pointer.texcoordY,
+      dx,
+      dy,
+      color,
+    );
   }
 
   function clickSplat(pointer) {
@@ -1213,28 +1254,50 @@ const useFluidCursor = () => {
   function splat(x, y, dx, dy, color) {
     splatProgram.bind();
 
-    gl.uniform1i(splatProgram.uniforms.uTarget, velocity.read.attach(0));
+    gl.uniform1i(
+      splatProgram.uniforms.uTarget,
+      velocity.read.attach(0),
+    );
 
     gl.uniform1f(
       splatProgram.uniforms.aspectRatio,
       canvas.width / canvas.height,
     );
 
-    gl.uniform2f(splatProgram.uniforms.point, x, y);
+    gl.uniform2f(
+      splatProgram.uniforms.point,
+      x,
+      y,
+    );
 
-    gl.uniform3f(splatProgram.uniforms.color, dx, dy, 0);
+    gl.uniform3f(
+      splatProgram.uniforms.color,
+      dx,
+      dy,
+      0,
+    );
 
     gl.uniform1f(
       splatProgram.uniforms.radius,
-      correctRadius(config.SPLAT_RADIUS / 100),
+      correctRadius(
+        config.SPLAT_RADIUS / 100,
+      ),
     );
 
     blit(velocity.write);
     velocity.swap();
 
-    gl.uniform1i(splatProgram.uniforms.uTarget, dye.read.attach(0));
+    gl.uniform1i(
+      splatProgram.uniforms.uTarget,
+      dye.read.attach(0),
+    );
 
-    gl.uniform3f(splatProgram.uniforms.color, color.r, color.g, color.b);
+    gl.uniform3f(
+      splatProgram.uniforms.color,
+      color.r,
+      color.g,
+      color.b,
+    );
 
     blit(dye.write);
     dye.swap();
@@ -1369,33 +1432,74 @@ const useFluidCursor = () => {
 
 
   /*
-   * Mobile:
-   * arrancamos la simulación automáticamente
-   * y generamos una pequeña nube inicial.
-   */
+  * Mobile:
+  * arrancamos la simulación automáticamente.
+  *
+  * No generamos splats automáticos:
+  * el fluido debe responder exclusivamente
+  * a la interacción real del usuario.
+  */
   if (isMobile) {
     startAnimation();
 
     window.setTimeout(() => {
       const trail = [
-        { x: 0.56, y: 0.58, dx: 22, dy: 2 },
-        { x: 0.6, y: 0.579, dx: 28, dy: 1 },
-        { x: 0.64, y: 0.577, dx: 34, dy: 0 },
-        { x: 0.68, y: 0.575, dx: 40, dy: -1 },
-        { x: 0.72, y: 0.572, dx: 46, dy: -2 },
-        { x: 0.76, y: 0.569, dx: 52, dy: -2 },
+        {
+          x: 0.50,
+          y: 0.545,
+          dx: 26,
+          dy: -1,
+          color: {
+            r: 0.28,
+            g: 0.22,
+            b: 0.75,
+          },
+        },
+        {
+          x: 0.57,
+          y: 0.54,
+          dx: 34,
+          dy: -1,
+          color: {
+            r: 0.38,
+            g: 0.41,
+            b: 0.75,
+          },
+        },
+        {
+          x: 0.64,
+          y: 0.535,
+          dx: 42,
+          dy: -2,
+          color: {
+            r: 0.51,
+            g: 0.54,
+            b: 0.75,
+          },
+        },
+        {
+          x: 0.71,
+          y: 0.53,
+          dx: 50,
+          dy: -2,
+          color: {
+            r: 0.36,
+            g: 0.41,
+            b: 0.75,
+          },
+        },
       ];
 
       trail.forEach((point, index) => {
         window.setTimeout(() => {
-          const color = generateColor();
-
-          color.r *= 1.5;
-          color.g *= 1.5;
-          color.b *= 1.5;
-
-          splat(point.x, point.y, point.dx, point.dy, color);
-        }, index * 85);
+          splat(
+            point.x,
+            point.y,
+            point.dx,
+            point.dy,
+            point.color,
+          );
+        }, index * 75);
       });
     }, 4300);
   }
@@ -1406,13 +1510,31 @@ const useFluidCursor = () => {
 
   window.addEventListener("mousemove", handleMouseMove);
 
-  document.body.addEventListener("touchstart", handleFirstTouchStart);
+  if (!isMobile) {
+    document.body.addEventListener(
+      "touchstart",
+      handleFirstTouchStart,
+      { passive: true },
+    );
+  }
 
-  window.addEventListener("touchstart", handleTouchStart);
+  window.addEventListener(
+    "touchstart",
+    handleTouchStart,
+    { passive: true },
+  );
 
-  window.addEventListener("touchmove", handleTouchMove, false);
+  window.addEventListener(
+    "touchmove",
+    handleTouchMove,
+    { passive: true },
+  );
 
-  window.addEventListener("touchend", handleTouchEnd);
+  window.addEventListener(
+    "touchend",
+    handleTouchEnd,
+    { passive: true },
+  );
 
   function updatePointerDownData(pointer, id, posX, posY) {
     pointer.id = id;
@@ -1541,10 +1663,27 @@ const useFluidCursor = () => {
     window.removeEventListener("mousedown", handleMouseDown);
     document.body.removeEventListener("mousemove", handleFirstMouseMove);
     window.removeEventListener("mousemove", handleMouseMove);
-    document.body.removeEventListener("touchstart", handleFirstTouchStart);
-    window.removeEventListener("touchstart", handleTouchStart);
-    window.removeEventListener("touchmove", handleTouchMove, false);
-    window.removeEventListener("touchend", handleTouchEnd);
+    if (!isMobile) {
+      document.body.removeEventListener(
+        "touchstart",
+        handleFirstTouchStart,
+      );
+    }
+
+    window.removeEventListener(
+      "touchstart",
+      handleTouchStart,
+    );
+
+    window.removeEventListener(
+      "touchmove",
+      handleTouchMove,
+    );
+
+    window.removeEventListener(
+      "touchend",
+      handleTouchEnd,
+    );
 
     if (animationFrameId !== null) {
       cancelAnimationFrame(animationFrameId);

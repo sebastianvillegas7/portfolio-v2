@@ -17,7 +17,6 @@ export default function GibberishText({
   text,
   className,
   intervalMs = 65,
-  pauseMs = 5000,
 }: GibberishTextProps) {
   const [revealedCount, setRevealedCount] = useState(text.length);
   const [randomCharacters, setRandomCharacters] = useState<string[]>(
@@ -31,10 +30,12 @@ export default function GibberishText({
     const clearTimers = () => {
       if (timeoutRef.current !== null) {
         window.clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
       }
 
       if (intervalRef.current !== null) {
         window.clearInterval(intervalRef.current);
+        intervalRef.current = null;
       }
     };
 
@@ -62,7 +63,12 @@ export default function GibberishText({
 
         iteration += 0.35;
 
-        setRevealedCount(Math.floor(iteration));
+        setRevealedCount(
+          Math.min(
+            text.length,
+            Math.floor(iteration),
+          )
+        );
 
         if (iteration >= text.length) {
           if (intervalRef.current !== null) {
@@ -72,22 +78,17 @@ export default function GibberishText({
 
           setRandomCharacters(text.split(""));
           setRevealedCount(text.length);
-
-          timeoutRef.current = window.setTimeout(
-            runAnimation,
-            pauseMs
-          );
         }
       }, intervalMs);
     };
 
     timeoutRef.current = window.setTimeout(
       runAnimation,
-      1200
+      500
     );
 
     return clearTimers;
-  }, [text, intervalMs, pauseMs]);
+  }, [text, intervalMs]);
 
   return (
     <span
@@ -121,12 +122,10 @@ export default function GibberishText({
             aria-hidden="true"
             className="relative inline-grid"
           >
-            {/* Define siempre el ancho usando la letra real */}
             <span className="invisible col-start-1 row-start-1">
               {originalCharacter}
             </span>
 
-            {/* Carácter animado, sin alterar el layout */}
             <span className="col-start-1 row-start-1 text-center">
               {visibleCharacter}
             </span>

@@ -16,7 +16,6 @@ import {
 
 import { WhatsAppIcon } from "@/components/icons/WhatsAppIcon";
 import { getWhatsAppUrl, siteConfig } from "@/config/site";
-import { SMART_ACTION_INITIAL_DELAY_MS } from "@/config/ui";
 import { useLanguage } from "@/i18n/LanguageProvider";
 
 type NavigationMode = "up" | "down";
@@ -93,6 +92,7 @@ export function SmartFloatingAction() {
 
   const interactionLockedRef = useRef(false);
   const pressedModeRef = useRef<ActionMode | null>(null);
+  const activatedRef = useRef(false);
 
   const clearTimer = (
     ref: React.MutableRefObject<number | null>,
@@ -144,14 +144,35 @@ export function SmartFloatingAction() {
   }, [revealWhatsApp]);
 
   useEffect(() => {
-    const initialTimer = window.setTimeout(() => {
+    const activate = () => {
+      if (activatedRef.current) {
+        return;
+      }
+
+      activatedRef.current = true;
       setEnabled(true);
       revealWhatsApp(true);
       setCycleKey((current) => current + 1);
-    }, SMART_ACTION_INITIAL_DELAY_MS);
+    };
+
+    if (
+      document.documentElement.dataset
+        .firstProjectReady === "true"
+    ) {
+      activate();
+      return;
+    }
+
+    window.addEventListener(
+      "selected-work:first-card-ready",
+      activate,
+    );
 
     return () => {
-      window.clearTimeout(initialTimer);
+      window.removeEventListener(
+        "selected-work:first-card-ready",
+        activate,
+      );
     };
   }, [revealWhatsApp]);
 

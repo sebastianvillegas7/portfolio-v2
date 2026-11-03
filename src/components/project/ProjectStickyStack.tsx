@@ -8,6 +8,7 @@ import { ArrowUpRight } from "lucide-react";
 
 import {
   motion,
+  useMotionValueEvent,
   useScroll,
   useSpring,
   useTransform,
@@ -311,6 +312,7 @@ export function ProjectStickyStack({
   intro,
 }: ProjectStickyStackProps) {
   const timelineRef = useRef<HTMLDivElement>(null);
+  const firstCardReadyRef = useRef(false);
 
   const timelineHeight = 125 + Math.max(projects.length - 1, 0) * 72;
 
@@ -329,6 +331,28 @@ export function ProjectStickyStack({
   });
 
   const firstCardWindow = getEntryWindow(0, projects.length);
+
+  useMotionValueEvent(
+    cardProgress,
+    "change",
+    (value) => {
+      if (
+        firstCardReadyRef.current ||
+        value < firstCardWindow.end
+      ) {
+        return;
+      }
+
+      firstCardReadyRef.current = true;
+
+      document.documentElement.dataset.firstProjectReady =
+        "true";
+
+      window.dispatchEvent(
+        new Event("selected-work:first-card-ready"),
+      );
+    },
+  );
 
   const introOpacity = useTransform(
     cardProgress,

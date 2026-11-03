@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import AnimatedGradientText from "@/components/animata/text/animated-gradient-text";
 import BlurOutUp from "@/components/animata/text/blur-out-up";
@@ -18,14 +18,34 @@ type HeroHeadlineProps = {
 };
 
 function HeroHeadline({ prefix, highlight }: HeroHeadlineProps) {
+  const [gradientMounted, setGradientMounted] = useState(false);
   const [showHeadlineGradient, setShowHeadlineGradient] = useState(false);
+
+  const revealFrameRef =
+    useRef<number | null>(null);
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
-      setShowHeadlineGradient(true);
+      setGradientMounted(true);
+
+      revealFrameRef.current =
+        window.requestAnimationFrame(() => {
+          revealFrameRef.current = null;
+          setShowHeadlineGradient(true);
+        });
     }, HERO_HEADLINE_GRADIENT_DELAY_MS);
 
-    return () => window.clearTimeout(timeout);
+    return () => {
+      window.clearTimeout(timeout);
+
+      if (revealFrameRef.current !== null) {
+        window.cancelAnimationFrame(
+          revealFrameRef.current,
+        );
+
+        revealFrameRef.current = null;
+      }
+    };
   }, []);
 
   return (
@@ -47,16 +67,18 @@ function HeroHeadline({ prefix, highlight }: HeroHeadlineProps) {
           />
         </span>
 
-        <span
-          aria-hidden="true"
-          className={`hero-title-gradient ${
-            showHeadlineGradient ? "is-visible" : "is-hidden"
-          }`}
-        >
-          <AnimatedGradientText className="hero-gradient-text">
-            {highlight}
-          </AnimatedGradientText>
-        </span>
+        {gradientMounted ? (
+          <span
+            aria-hidden="true"
+            className={`hero-title-gradient ${
+              showHeadlineGradient ? "is-visible" : "is-hidden"
+            }`}
+          >
+            <AnimatedGradientText className="hero-gradient-text">
+              {highlight}
+            </AnimatedGradientText>
+          </span>
+        ) : null}
       </span>
     </h1>
   );
