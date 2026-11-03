@@ -8,87 +8,124 @@ import { globalPerformanceState } from "@/components/effects/global-performance-
 
 const EFFECTS_FADE_DURATION_MS = 850;
 const RESUME_GAP_PX = 48;
+const FLUID_SUSPEND_Y_PX = 96;
+const FLUID_RESUME_Y_PX = 144;
 
 export function GlobalEffects() {
-  const [effectsMounted, setEffectsMounted] =
-    useState(true);
+  const [effectsMounted, setEffectsMounted] = useState(true);
+  const [lightFadedOut, setLightFadedOut] = useState(false);
+  const [fluidHidden, setFluidHidden] = useState(false);
 
-  const [effectsFadedOut, setEffectsFadedOut] =
-    useState(false);
-
-  const suspendedRef =
-    useRef(false);
-
-  const fadeTimerRef =
-    useRef<number | null>(null);
-
-  const frameRef =
-    useRef<number | null>(null);
+  const suspendedRef = useRef(false);
+  const fluidSuspendedRef = useRef(false);
+  const fadeTimerRef = useRef<number | null>(null);
+  const frameRef = useRef<number | null>(null);
+  const resumeFrameOneRef = useRef<number | null>(null);
+  const resumeFrameTwoRef = useRef<number | null>(null);
+  const fluidClipRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const clearFadeTimer = () => {
       if (fadeTimerRef.current !== null) {
-        window.clearTimeout(
-          fadeTimerRef.current,
-        );
-
+        window.clearTimeout(fadeTimerRef.current);
         fadeTimerRef.current = null;
       }
     };
 
-    const suspendEffects = () => {
-      if (suspendedRef.current) {
+    const clearResumeFrames = () => {
+      if (resumeFrameOneRef.current !== null) {
+        window.cancelAnimationFrame(resumeFrameOneRef.current);
+        resumeFrameOneRef.current = null;
+      }
+
+      if (resumeFrameTwoRef.current !== null) {
+        window.cancelAnimationFrame(resumeFrameTwoRef.current);
+        resumeFrameTwoRef.current = null;
+      }
+    };
+
+    const updateFluidMask = (titleTop: number | null) => {
+      const element = fluidClipRef.current;
+      if (!element) return;
+
+      if (titleTop === null) {
+        element.style.maskImage = "none";
+        element.style.webkitMaskImage = "none";
         return;
       }
 
+      const cutoffY = Math.max(
+        0,
+        Math.min(window.innerHeight, titleTop),
+      );
+
+      const fadeSize = 72;
+      const fadeStart = Math.max(0, cutoffY - fadeSize);
+
+      const mask = `linear-gradient(
+        to bottom,
+        black 0px,
+        black ${fadeStart}px,
+        transparent ${cutoffY}px,
+        transparent 100%
+      )`;
+
+      element.style.maskImage = mask;
+      element.style.webkitMaskImage = mask;
+    };
+
+    const pauseFluid = () => {
+      if (fluidSuspendedRef.current) return;
+
+      fluidSuspendedRef.current = true;
+      setFluidHidden(true);
+
+      window.dispatchEvent(
+        new Event("fluid-cursor:pause"),
+      );
+    };
+
+    const resumeFluid = () => {
+      if (!fluidSuspendedRef.current) return;
+
+      fluidSuspendedRef.current = false;
+      setFluidHidden(false);
+
+      window.dispatchEvent(
+        new Event("fluid-cursor:resume"),
+      );
+    };
+
+    const suspendEffects = () => {
+      if (suspendedRef.current) return;
+
       suspendedRef.current = true;
-
-      /*
-       * Primero desaparece visualmente todo el bloque.
-       * Los efectos todavía siguen vivos durante el fade,
-       * así que no hay flash ni corte brusco.
-       */
-      setEffectsFadedOut(true);
-
+      globalPerformanceState.isScrolling = true;
+      setLightFadedOut(true);
       clearFadeTimer();
 
-      fadeTimerRef.current =
-        window.setTimeout(() => {
-          /*
-           * Recién cuando el fade terminó:
-           * - detenemos FluidCursor;
-           * - desmontamos los efectos pesados.
-           */
-          globalPerformanceState.isScrolling =
-            true;
-
-          setEffectsMounted(false);
-
-          fadeTimerRef.current = null;
-        }, EFFECTS_FADE_DURATION_MS);
+      fadeTimerRef.current = window.setTimeout(() => {
+        setEffectsMounted(false);
+        fadeTimerRef.current = null;
+      }, EFFECTS_FADE_DURATION_MS);
     };
 
     const resumeEffects = () => {
-      if (!suspendedRef.current) {
-        return;
-      }
+      if (!suspendedRef.current) return;
 
       suspendedRef.current = false;
-
       clearFadeTimer();
+      clearResumeFrames();
 
-      /*
-       * Reactivamos primero mientras todavía está
-       * invisible y después hacemos el fade-in.
-       */
-      globalPerformanceState.isScrolling =
-        false;
-
+      globalPerformanceState.isScrolling = false;
       setEffectsMounted(true);
 
-      window.requestAnimationFrame(() => {
-        window.requestAnimationFrame(() => {
-          setEffectsFadedOut(false);
+      resumeFrameOneRef.current = window.requestAnimationFrame(() => {
+        resumeFrameOneRef.current = null;
+
+        resumeFrameTwoRef.current = window.requestAnimationFrame(() => {
+          resumeFrameTwoRef.current = null;
+          setLightFadedOut(false);
         });
       });
     };
@@ -96,153 +133,131 @@ export function GlobalEffects() {
     const updateEffectsState = () => {
       frameRef.current = null;
 
-      const scene =
-        document.querySelector<HTMLElement>(
-          "#work .project-sticky-scene",
-        );
+      const selectedWorkTitle = document.getElementById(
+        "selected-work-title",
+      );
 
-      if (!scene) {
+      const scene = document.querySelector<HTMLElement>(
+        "#work .project-sticky-scene",
+      );
+
+      if (!selectedWorkTitle || !scene) {
+        updateFluidMask(null);
+        resumeFluid();
         resumeEffects();
         return;
       }
 
-      const sceneRect =
-        scene.getBoundingClientRect();
+      const titleRect = selectedWorkTitle.getBoundingClientRect();
+      updateFluidMask(titleRect.top);
 
-      /*
-       * Leemos el top REAL del sticky desde CSS
-       * (`--project-scene-top` termina resolviendo en 2rem).
-       * No usamos porcentajes arbitrarios del viewport.
-       */
+      if (
+        !fluidSuspendedRef.current &&
+        titleRect.top <= FLUID_SUSPEND_Y_PX
+      ) {
+        pauseFluid();
+      } else if (
+        fluidSuspendedRef.current &&
+        titleRect.top > FLUID_RESUME_Y_PX
+      ) {
+        resumeFluid();
+      }
+
+      const sceneRect = scene.getBoundingClientRect();
       const stickyTop =
         Number.parseFloat(
           window.getComputedStyle(scene).top,
         ) || 0;
 
-      /*
-       * Cuando la escena llega a su posición sticky,
-       * el título ya quedó arriba y comienza el tramo
-       * donde entra la primera card.
-       */
       const reachedStickyPoint =
         sceneRect.top <= stickyTop + 1;
 
-      /*
-       * Hysteresis simple para que al subir no esté
-       * prendiendo/apagando alrededor del mismo píxel.
-       */
       const leftStickyPoint =
-        sceneRect.top >
-        stickyTop + RESUME_GAP_PX;
+        sceneRect.top > stickyTop + RESUME_GAP_PX;
 
-      if (
-        !suspendedRef.current &&
-        reachedStickyPoint
-      ) {
+      if (!suspendedRef.current && reachedStickyPoint) {
         suspendEffects();
         return;
       }
 
-      if (
-        suspendedRef.current &&
-        leftStickyPoint
-      ) {
+      if (suspendedRef.current && leftStickyPoint) {
         resumeEffects();
       }
     };
 
     const scheduleUpdate = () => {
-      if (frameRef.current !== null) {
-        return;
-      }
+      if (frameRef.current !== null) return;
 
-      frameRef.current =
-        window.requestAnimationFrame(
-          updateEffectsState,
-        );
+      frameRef.current = window.requestAnimationFrame(
+        updateEffectsState,
+      );
     };
 
     const handleVisibilityChange = () => {
-      globalPerformanceState.isDocumentVisible =
-        !document.hidden;
+      globalPerformanceState.isDocumentVisible = !document.hidden;
     };
 
     handleVisibilityChange();
     updateEffectsState();
 
-    window.addEventListener(
-      "scroll",
-      scheduleUpdate,
-      {
-        passive: true,
-      },
-    );
-
-    window.addEventListener(
-      "resize",
-      scheduleUpdate,
-    );
-
+    window.addEventListener("scroll", scheduleUpdate, { passive: true });
+    window.addEventListener("resize", scheduleUpdate);
     document.addEventListener(
       "visibilitychange",
       handleVisibilityChange,
     );
 
     return () => {
-      window.removeEventListener(
-        "scroll",
-        scheduleUpdate,
-      );
-
-      window.removeEventListener(
-        "resize",
-        scheduleUpdate,
-      );
-
+      window.removeEventListener("scroll", scheduleUpdate);
+      window.removeEventListener("resize", scheduleUpdate);
       document.removeEventListener(
         "visibilitychange",
         handleVisibilityChange,
       );
 
       clearFadeTimer();
+      clearResumeFrames();
 
       if (frameRef.current !== null) {
-        window.cancelAnimationFrame(
-          frameRef.current,
-        );
+        window.cancelAnimationFrame(frameRef.current);
+        frameRef.current = null;
       }
 
-      globalPerformanceState.isScrolling =
-        false;
+      window.dispatchEvent(
+        new Event("fluid-cursor:resume"),
+      );
+
+      globalPerformanceState.isScrolling = false;
     };
   }, []);
 
   return (
-    <div
-      className="absolute inset-0"
-      style={{
-        opacity:
-          effectsFadedOut
-            ? 0
-            : 1,
+    <div className="absolute inset-0">
+      <div
+        className="absolute inset-0"
+        style={{
+          opacity: lightFadedOut ? 0 : 1,
+          transition: `opacity ${EFFECTS_FADE_DURATION_MS}ms ease`,
+        }}
+      >
+        {effectsMounted && <GlobalLight />}
+      </div>
 
-        transition:
-          `opacity ${EFFECTS_FADE_DURATION_MS}ms ease`,
-      }}
-    >
-      {effectsMounted && (
-        <>
-          <GlobalLight />
-
-          <FluidCursor
-            opacity={1}
-            hidden={false}
-            fadeDurationMs={
-              EFFECTS_FADE_DURATION_MS
-            }
-          />
-        </>
-      )}
+      <div
+        ref={fluidClipRef}
+        className="absolute inset-0"
+        style={{
+          maskImage: "none",
+          WebkitMaskImage: "none",
+          visibility: fluidHidden ? "hidden" : "visible",
+        }}
+      >
+        <FluidCursor
+          opacity={1}
+          hidden={false}
+          fadeDurationMs={EFFECTS_FADE_DURATION_MS}
+        />
+      </div>
     </div>
   );
 }

@@ -117,7 +117,7 @@ function ProjectStickyCard({
 
       firstWindow.end,
     ],
-    ["38vh", "10vh", "3vh", "0vh"],
+    ["30vh", "10vh", "3vh", "0vh"],
   );
 
   /*
