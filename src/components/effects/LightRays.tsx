@@ -217,7 +217,6 @@ const fragmentShader = `
     color.rgb *=
       1.0 +
       pulse * 0.12;
-      pulse * 0.12;
 
     float sourceDistance =
       distance(
@@ -266,9 +265,6 @@ export function LightRays({
   const containerRef =
     useRef<HTMLDivElement>(null);
 
-  /*
-   * Pointer
-   */
   const pointerRef = useRef({
     x: 0.5,
     y: 0.5,
@@ -279,12 +275,6 @@ export function LightRays({
     y: 0.5,
   });
 
-  /*
-   * Dynamic light values.
-   *
-   * These refs allow React props to change without
-   * destroying/recreating the WebGL canvas.
-   */
   const targetRef = useRef({
     originX,
     originY,
@@ -320,13 +310,12 @@ export function LightRays({
   const pulseStartRef =
     useRef<number | null>(null);
 
+  const isMobileRef =
+    useRef(false);
+
   const prefersReducedMotion =
     useReducedMotion();
 
-  /*
-   * Update targets only.
-   * The canvas remains alive.
-   */
   useEffect(() => {
     targetRef.current = {
       originX,
@@ -343,7 +332,8 @@ export function LightRays({
 
       pointerInfluence:
         followPointer &&
-        !prefersReducedMotion
+        !prefersReducedMotion &&
+        !isMobileRef.current
           ? pointerInfluence
           : 0,
     };
@@ -361,9 +351,6 @@ export function LightRays({
     prefersReducedMotion,
   ]);
 
-  /*
-   * Pulse trigger.
-   */
   useEffect(() => {
     if (
       pulseSignal === 0 ||
@@ -387,12 +374,22 @@ export function LightRays({
       return;
     }
 
+    const isMobile =
+      window.matchMedia(
+        "(max-width: 767px)",
+      ).matches;
+
+    isMobileRef.current =
+      isMobile;
+
     const renderer =
       new Renderer({
-        dpr: Math.min(
-          window.devicePixelRatio,
-          1.5,
-        ),
+        dpr: isMobile
+          ? 1
+          : Math.min(
+              window.devicePixelRatio,
+              1.5,
+            ),
         alpha: true,
       });
 
@@ -411,6 +408,11 @@ export function LightRays({
 
     const initial =
       currentRef.current;
+
+    if (isMobile) {
+      initial.pointerInfluence = 0;
+      targetRef.current.pointerInfluence = 0;
+    }
 
     const uniforms: Uniforms = {
       time: {
@@ -507,29 +509,23 @@ export function LightRays({
         nextHeight,
       );
 
-      uniforms.resolution.value = [
-        nextWidth * renderer.dpr,
-        nextHeight * renderer.dpr,
-      ];
+      uniforms.resolution.value[0] =
+        nextWidth * renderer.dpr;
+
+      uniforms.resolution.value[1] =
+        nextHeight * renderer.dpr;
     };
 
     const handlePointerMove = (
       event: PointerEvent,
     ) => {
-      const bounds =
-        element.getBoundingClientRect();
+      pointerRef.current.x =
+        event.clientX /
+        window.innerWidth;
 
-      pointerRef.current = {
-        x:
-          (event.clientX -
-            bounds.left) /
-          bounds.width,
-
-        y:
-          (event.clientY -
-            bounds.top) /
-          bounds.height,
-      };
+      pointerRef.current.y =
+        event.clientY /
+        window.innerHeight;
     };
 
     let animationFrame = 0;
@@ -554,11 +550,6 @@ export function LightRays({
         const current =
           currentRef.current;
 
-        /*
-         * Slow interpolation.
-         * This is what will let us move the light
-         * smoothly between sections later.
-         */
         const movementSmooth =
           prefersReducedMotion
             ? 1
@@ -626,27 +617,27 @@ export function LightRays({
           );
 
         current.pointerInfluence =
-          smoothValue(
-            current.pointerInfluence,
-            target.pointerInfluence,
-            propertySmooth,
-          );
+          isMobile
+            ? 0
+            : smoothValue(
+                current.pointerInfluence,
+                target.pointerInfluence,
+                propertySmooth,
+              );
 
-        /*
-         * Update WebGL uniforms.
-         */
-        uniforms.rayPosition.value = [
+        uniforms.rayPosition.value[0] =
           uniforms.resolution.value[0] *
-            current.originX,
+          current.originX;
 
+        uniforms.rayPosition.value[1] =
           uniforms.resolution.value[1] *
-            current.originY,
-        ];
+          current.originY;
 
-        uniforms.rayDirection.value = [
-          current.directionX,
-          current.directionY,
-        ];
+        uniforms.rayDirection.value[0] =
+          current.directionX;
+
+        uniforms.rayDirection.value[1] =
+          current.directionY;
 
         uniforms.intensity.value =
           current.intensity;
@@ -665,32 +656,29 @@ export function LightRays({
         uniforms.pointerInfluence.value =
           current.pointerInfluence;
 
-        /*
-         * Pointer smoothing.
-         */
-        smoothPointerRef.current.x +=
-          (
-            pointerRef.current.x -
-            smoothPointerRef.current.x
-          ) * 0.06;
+        if (!isMobile) {
+          smoothPointerRef.current.x +=
+            (
+              pointerRef.current.x -
+              smoothPointerRef.current.x
+            ) * 0.06;
 
-        smoothPointerRef.current.y +=
-          (
-            pointerRef.current.y -
-            smoothPointerRef.current.y
-          ) * 0.06;
+          smoothPointerRef.current.y +=
+            (
+              pointerRef.current.y -
+              smoothPointerRef.current.y
+            ) * 0.06;
 
-        uniforms.pointer.value = [
-          smoothPointerRef.current.x,
-          smoothPointerRef.current.y,
-        ];
+          uniforms.pointer.value[0] =
+            smoothPointerRef.current.x;
+
+          uniforms.pointer.value[1] =
+            smoothPointerRef.current.y;
+        }
 
         uniforms.time.value =
           time * 0.001;
 
-        /*
-         * Pulse.
-         */
         if (
           pulseStartRef.current !==
           null
@@ -722,9 +710,21 @@ export function LightRays({
           uniforms.pulse.value = 0;
         }
 
-        renderer.render({
-          scene: mesh,
-        });
+        /*
+         * Cuando la luz ya es prácticamente invisible,
+         * evitamos una pasada WebGL fullscreen que no aporta
+         * nada visual.
+         */
+        const shouldRender =
+          current.intensity > 0.01 ||
+          target.intensity > 0.01 ||
+          uniforms.pulse.value > 0;
+
+        if (shouldRender) {
+          renderer.render({
+            scene: mesh,
+          });
+        }
       }
 
       animationFrame =
@@ -750,10 +750,15 @@ export function LightRays({
       element,
     );
 
-    window.addEventListener(
-      "pointermove",
-      handlePointerMove,
-    );
+    if (!isMobile) {
+      window.addEventListener(
+        "pointermove",
+        handlePointerMove,
+        {
+          passive: true,
+        },
+      );
+    }
 
     resize();
 
@@ -771,10 +776,12 @@ export function LightRays({
 
       visibilityObserver.disconnect();
 
-      window.removeEventListener(
-        "pointermove",
-        handlePointerMove,
-      );
+      if (!isMobile) {
+        window.removeEventListener(
+          "pointermove",
+          handlePointerMove,
+        );
+      }
 
       if (
         gl.canvas.parentNode ===

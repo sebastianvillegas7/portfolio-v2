@@ -26,6 +26,7 @@ const IDLE_HIDE_DELAY_MS = 8000;
 const HIDDEN_REAPPEAR_DELAY_MS = 8000;
 const NAV_SUGGESTION_DELAY_MS = 3200;
 const TOOLTIP_VISIBLE_MS = 1700;
+const SCROLL_IDLE_DELAY_MS = 140;
 
 const ICON_TRANSITION_DURATION = 0.95;
 const BUTTON_COLOR_TRANSITION_DURATION = 1.05;
@@ -86,9 +87,9 @@ export function SmartFloatingAction() {
   const [cycleKey, setCycleKey] = useState(0);
   const [enabled, setEnabled] = useState(false);
 
-  const frameRef = useRef<number | null>(null);
   const tooltipRef = useRef<number | null>(null);
   const hiddenReturnRef = useRef<number | null>(null);
+  const scrollIdleRef = useRef<number | null>(null);
 
   const interactionLockedRef = useRef(false);
   const pressedModeRef = useRef<ActionMode | null>(null);
@@ -200,17 +201,15 @@ export function SmartFloatingAction() {
     }
 
     const handleScroll = () => {
-      if (frameRef.current !== null) {
-        return;
-      }
+      clearTimer(scrollIdleRef);
 
-      frameRef.current = window.requestAnimationFrame(() => {
+      scrollIdleRef.current = window.setTimeout(() => {
+        scrollIdleRef.current = null;
+
         if (!interactionLockedRef.current) {
           restartCycle();
         }
-
-        frameRef.current = null;
-      });
+      }, SCROLL_IDLE_DELAY_MS);
     };
 
     const handleActivity = () => {
@@ -241,9 +240,7 @@ export function SmartFloatingAction() {
         handleActivity,
       );
 
-      if (frameRef.current !== null) {
-        window.cancelAnimationFrame(frameRef.current);
-      }
+      clearTimer(scrollIdleRef);
     };
   }, [enabled, restartCycle]);
 
@@ -251,6 +248,7 @@ export function SmartFloatingAction() {
     return () => {
       clearTimer(tooltipRef);
       clearTimer(hiddenReturnRef);
+      clearTimer(scrollIdleRef);
     };
   }, []);
 

@@ -2,15 +2,7 @@
 
 import {
   useMemo,
-  useRef,
 } from "react";
-
-import {
-  motion,
-  useScroll,
-  useSpring,
-  useTransform,
-} from "motion/react";
 
 import { ProjectStickyStack } from "@/components/project/ProjectStickyStack";
 import { SectionHeading } from "@/components/ui/SectionHeading";
@@ -36,34 +28,6 @@ export function SelectedWork() {
       [language],
     );
 
-  const titleRef =
-    useRef<HTMLDivElement>(null);
-
-  const { scrollYProgress } = useScroll({
-    target: titleRef,
-    offset: [
-      "start 32%",
-      "start 12%",
-    ],
-  });
-
-  const smoothTitleProgress =
-    useSpring(
-      scrollYProgress,
-      {
-        stiffness: 90,
-        damping: 26,
-        mass: 0.35,
-      },
-    );
-
-  const titleY =
-    useTransform(
-      smoothTitleProgress,
-      [0, 1],
-      [0, 10],
-    );
-
   return (
     <section
       id="work"
@@ -75,13 +39,7 @@ export function SelectedWork() {
           <ProjectStickyStack
             projects={localizedProjects}
             title={
-              <motion.div
-                ref={titleRef}
-                className="selected-work-title-pin"
-                style={{
-                  y: titleY,
-                }}
-              >
+              <div className="selected-work-title-pin">
                 <SectionHeading
                   eyebrow={
                     t.selectedWork.eyebrow
@@ -91,7 +49,7 @@ export function SelectedWork() {
                   }
                   titleId="selected-work-title"
                 />
-              </motion.div>
+              </div>
             }
             intro={
               <>

@@ -6,14 +6,14 @@ const useFluidCursor = () => {
   const isMobile = window.matchMedia("(max-width: 767px)").matches;
 
   const pixelRatio = isMobile
-    ? Math.min(window.devicePixelRatio || 1, 1.25)
+    ? Math.min(window.devicePixelRatio || 1, 1.5)
     : window.devicePixelRatio || 1;
 
   resizeCanvas();
 
   let config = {
     SIM_RESOLUTION: 128,
-    DYE_RESOLUTION: isMobile ? 384 : 1440,
+    DYE_RESOLUTION: isMobile ? 512 : 1440,
     CAPTURE_RESOLUTION: 512,
 
     DENSITY_DISSIPATION: isMobile ? 2.4 : 3.5,
