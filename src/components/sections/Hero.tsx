@@ -46,6 +46,7 @@ function HeroHeadline({ prefix, highlight }: HeroHeadlineProps) {
             yPx={24}
           />
         </span>
+
         <span
           aria-hidden="true"
           className={`hero-title-gradient ${
@@ -69,29 +70,26 @@ export function Hero() {
       <div className="hero-container">
         <div className="hero-topbar hero-reveal">
           <AnimatedName />
-
-          <div className="flex min-w-0 flex-1 items-center justify-end gap-2.5 sm:gap-3">
-            <div className="hero-roles">
-              <BlurOutUp
-                key={language}
-                text={[...t.hero.roles]}
-                holdMs={2400}
-                gapMs={180}
-                speed={1}
-                yTravel={0.2}
-                className="hero-roles-text"
-                stageClassName="overflow-visible place-items-end"
-              />
-            </div>
-
-            <LanguageSwitcher />
-          </div>
+          <LanguageSwitcher />
         </div>
 
         <div className="hero-main">
           <div className="hero-content">
             <div className="hero-badge-wrapper">
-              <span className="hero-badge">{t.hero.badge}</span>
+              <div className="hero-badge min-w-[15rem] justify-center">
+                <div className="h-[1.4rem] w-full">
+                  <BlurOutUp
+                    key={language}
+                    text={[t.hero.badge, ...t.hero.roles]}
+                    holdMs={3900}
+                    gapMs={180}
+                    speed={1}
+                    yTravel={0.2}
+                    className="h-full w-full tracking-[0.1em]"
+                    stageClassName="overflow-visible place-items-center"
+                  />
+                </div>
+              </div>
             </div>
 
             <HeroHeadline
