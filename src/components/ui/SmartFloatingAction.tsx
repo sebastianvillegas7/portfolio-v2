@@ -1,165 +1,203 @@
 "use client";
 
-import { ChevronDown, ChevronUp } from "lucide-react";
 import {
-  AnimatePresence,
-  motion,
-  useReducedMotion,
-} from "motion/react";
+  ChevronDown,
+  ChevronUp,
+} from "lucide-react";
 import {
-  useCallback,
   useEffect,
-  useMemo,
   useRef,
   useState,
+  type ReactNode,
 } from "react";
 
 import { WhatsAppIcon } from "@/components/icons/WhatsAppIcon";
-import { getWhatsAppUrl, siteConfig } from "@/config/site";
+import {
+  getWhatsAppUrl,
+  siteConfig,
+} from "@/config/site";
 import { useLanguage } from "@/i18n/LanguageProvider";
 
 type NavigationMode = "up" | "down";
 type ActionMode = NavigationMode | "whatsapp";
 
-const IDLE_HIDE_DELAY_MS = 8000;
-const HIDDEN_REAPPEAR_DELAY_MS = 8000;
-const NAV_SUGGESTION_DELAY_MS = 3200;
-const TOOLTIP_VISIBLE_MS = 1700;
-const SCROLL_IDLE_DELAY_MS = 140;
+const NAV_DELAY = 3200;
+const HIDE_DELAY = 8000;
+const RETURN_DELAY = 8000;
+const TOOLTIP_DELAY = 1700;
+const SCROLL_IDLE_DELAY = 140;
 
-const ICON_TRANSITION_DURATION = 0.95;
-const BUTTON_COLOR_TRANSITION_DURATION = 1.05;
+const EASE =
+  "cubic-bezier(0.22, 1, 0.36, 1)";
 
-function getSectionElements() {
+function getSections() {
   return siteConfig.navigationSectionIds
-    .map((id) => document.getElementById(id))
-    .filter((element): element is HTMLElement => Boolean(element));
+    .map((id) =>
+      document.getElementById(id),
+    )
+    .filter(
+      (
+        element,
+      ): element is HTMLElement =>
+        Boolean(element),
+    );
 }
 
 function getNavigationMode(): NavigationMode {
-  const sections = getSectionElements();
+  const sections = getSections();
 
-  if (sections.length === 0) {
-    return window.scrollY > 0 ? "up" : "down";
+  if (!sections.length) {
+    return window.scrollY > 0
+      ? "up"
+      : "down";
   }
 
   const viewportCenter =
-    window.scrollY + window.innerHeight * 0.5;
+    window.scrollY +
+    window.innerHeight * 0.5;
 
-  const lastSection = sections[sections.length - 1];
+  const last =
+    sections[
+      sections.length - 1
+    ];
 
-  const lastSectionThreshold =
-    lastSection.offsetTop + lastSection.offsetHeight * 0.45;
+  const threshold =
+    last.offsetTop +
+    last.offsetHeight * 0.45;
 
-  return viewportCenter >= lastSectionThreshold ? "up" : "down";
+  return viewportCenter >= threshold
+    ? "up"
+    : "down";
 }
 
 function getNextSection() {
-  const sections = getSectionElements();
-
   const currentY =
     window.scrollY +
-    Math.min(window.innerHeight * 0.28, 180);
+    Math.min(
+      window.innerHeight * 0.28,
+      180,
+    );
 
-  return sections.find((section) => section.offsetTop > currentY);
-}
-
-function scrollToSection(
-  element: HTMLElement,
-  reduceMotion: boolean,
-) {
-  element.scrollIntoView({
-    behavior: reduceMotion ? "auto" : "smooth",
-    block: "start",
-  });
+  return getSections().find(
+    (section) =>
+      section.offsetTop >
+      currentY,
+  );
 }
 
 export function SmartFloatingAction() {
-  const { language } = useLanguage();
-  const reduceMotion = useReducedMotion();
+  const { language } =
+    useLanguage();
 
-  const whatsappUrl = getWhatsAppUrl(language);
+  const whatsappUrl =
+    getWhatsAppUrl(language);
 
-  const [mode, setMode] = useState<ActionMode>("whatsapp");
-  const [visible, setVisible] = useState(false);
-  const [tooltipVisible, setTooltipVisible] = useState(false);
-  const [cycleKey, setCycleKey] = useState(0);
-  const [enabled, setEnabled] = useState(false);
+  const [enabled, setEnabled] =
+    useState(false);
 
-  const tooltipRef = useRef<number | null>(null);
-  const hiddenReturnRef = useRef<number | null>(null);
-  const scrollIdleRef = useRef<number | null>(null);
+  const [visible, setVisible] =
+    useState(false);
 
-  const interactionLockedRef = useRef(false);
-  const pressedModeRef = useRef<ActionMode | null>(null);
-  const activatedRef = useRef(false);
+  const [mode, setMode] =
+    useState<ActionMode>(
+      "whatsapp",
+    );
 
-  const clearTimer = (
-    ref: React.MutableRefObject<number | null>,
-  ) => {
-    if (ref.current !== null) {
-      window.clearTimeout(ref.current);
-      ref.current = null;
+  const [
+    tooltipVisible,
+    setTooltipVisible,
+  ] = useState(false);
+
+  const locked =
+    useRef(false);
+
+  const pressedMode =
+    useRef<ActionMode | null>(
+      null,
+    );
+
+  const activated =
+    useRef(false);
+
+  const restartRef =
+    useRef<() => void>(
+      () => {},
+    );
+
+  const tooltipTimer =
+    useRef<number | null>(
+      null,
+    );
+
+  const showTooltip = () => {
+    if (
+      tooltipTimer.current !==
+      null
+    ) {
+      window.clearTimeout(
+        tooltipTimer.current,
+      );
     }
-  };
-
-  const showTooltip = useCallback(() => {
-    clearTimer(tooltipRef);
 
     setTooltipVisible(true);
 
-    tooltipRef.current = window.setTimeout(() => {
-      setTooltipVisible(false);
-    }, TOOLTIP_VISIBLE_MS);
-  }, []);
+    tooltipTimer.current =
+      window.setTimeout(
+        () => {
+          tooltipTimer.current =
+            null;
 
-  const revealWhatsApp = useCallback(
-    (withTooltip = false) => {
-      if (interactionLockedRef.current) {
+          setTooltipVisible(
+            false,
+          );
+        },
+        TOOLTIP_DELAY,
+      );
+  };
+
+  const hideTooltip = () => {
+    if (
+      tooltipTimer.current !==
+      null
+    ) {
+      window.clearTimeout(
+        tooltipTimer.current,
+      );
+
+      tooltipTimer.current =
+        null;
+    }
+
+    setTooltipVisible(false);
+  };
+
+  useEffect(() => {
+    const activate = () => {
+      if (activated.current) {
         return;
       }
+
+      activated.current = true;
 
       setMode(
         whatsappUrl
           ? "whatsapp"
           : getNavigationMode(),
       );
+
       setVisible(true);
-
-      if (withTooltip) {
-        showTooltip();
-      }
-    },
-    [showTooltip, whatsappUrl],
-  );
-
-  const restartCycle = useCallback(() => {
-    clearTimer(hiddenReturnRef);
-
-    if (!interactionLockedRef.current) {
-      revealWhatsApp(false);
-    }
-
-    setCycleKey((current) => current + 1);
-  }, [revealWhatsApp]);
-
-  useEffect(() => {
-    const activate = () => {
-      if (activatedRef.current) {
-        return;
-      }
-
-      activatedRef.current = true;
+      showTooltip();
       setEnabled(true);
-      revealWhatsApp(true);
-      setCycleKey((current) => current + 1);
     };
 
     if (
-      document.documentElement.dataset
-        .firstProjectReady === "true"
+      document.documentElement
+        .dataset
+        .firstProjectReady ===
+      "true"
     ) {
       activate();
+
       return;
     }
 
@@ -174,388 +212,574 @@ export function SmartFloatingAction() {
         activate,
       );
     };
-  }, [revealWhatsApp]);
-
-  useEffect(() => {
-    if (!enabled || !visible) {
-      return;
-    }
-
-    const navSuggestionTimer = window.setTimeout(() => {
-      if (interactionLockedRef.current) {
-        return;
-      }
-
-      setMode(getNavigationMode());
-      showTooltip();
-    }, NAV_SUGGESTION_DELAY_MS);
-
-    const hideTimer = window.setTimeout(() => {
-      if (interactionLockedRef.current) {
-        return;
-      }
-
-      setTooltipVisible(false);
-      setVisible(false);
-
-      hiddenReturnRef.current = window.setTimeout(() => {
-        revealWhatsApp(true);
-        setCycleKey((current) => current + 1);
-      }, HIDDEN_REAPPEAR_DELAY_MS);
-    }, IDLE_HIDE_DELAY_MS);
-
-    return () => {
-      window.clearTimeout(navSuggestionTimer);
-      window.clearTimeout(hideTimer);
-    };
-  }, [
-    cycleKey,
-    enabled,
-    revealWhatsApp,
-    showTooltip,
-    visible,
-  ]);
+  }, []);
 
   useEffect(() => {
     if (!enabled) {
       return;
     }
 
-    const handleScroll = () => {
-      clearTimer(scrollIdleRef);
+    let navTimer:
+      | number
+      | null = null;
 
-      scrollIdleRef.current = window.setTimeout(() => {
-        scrollIdleRef.current = null;
+    let hideTimer:
+      | number
+      | null = null;
 
-        if (!interactionLockedRef.current) {
-          restartCycle();
+    let returnTimer:
+      | number
+      | null = null;
+
+    let scrollIdleTimer:
+      | number
+      | null = null;
+
+    let scrollFrame:
+      | number
+      | null = null;
+
+    const clearCycle =
+      () => {
+        if (
+          navTimer !== null
+        ) {
+          window.clearTimeout(
+            navTimer,
+          );
+
+          navTimer = null;
         }
-      }, SCROLL_IDLE_DELAY_MS);
+
+        if (
+          hideTimer !== null
+        ) {
+          window.clearTimeout(
+            hideTimer,
+          );
+
+          hideTimer = null;
+        }
+
+        if (
+          returnTimer !== null
+        ) {
+          window.clearTimeout(
+            returnTimer,
+          );
+
+          returnTimer = null;
+        }
+      };
+
+    function startCycle(
+      showInitial = true,
+    ) {
+      clearCycle();
+
+      if (showInitial) {
+        setMode(
+          whatsappUrl
+            ? "whatsapp"
+            : getNavigationMode(),
+        );
+
+        setVisible(true);
+      }
+
+      navTimer =
+        window.setTimeout(
+          () => {
+            navTimer = null;
+
+            if (
+              locked.current
+            ) {
+              return;
+            }
+
+            setMode(
+              getNavigationMode(),
+            );
+
+            showTooltip();
+          },
+          NAV_DELAY,
+        );
+
+      hideTimer =
+        window.setTimeout(
+          () => {
+            hideTimer = null;
+
+            if (
+              locked.current
+            ) {
+              return;
+            }
+
+            hideTooltip();
+            setVisible(false);
+
+            returnTimer =
+              window.setTimeout(
+                () => {
+                  returnTimer =
+                    null;
+
+                  if (
+                    locked.current
+                  ) {
+                    return;
+                  }
+
+                  setMode(
+                    whatsappUrl
+                      ? "whatsapp"
+                      : getNavigationMode(),
+                  );
+
+                  setVisible(
+                    true,
+                  );
+
+                  showTooltip();
+
+                  startCycle(
+                    false,
+                  );
+                },
+                RETURN_DELAY,
+              );
+          },
+          HIDE_DELAY,
+        );
+    }
+
+    restartRef.current = () => {
+      startCycle(true);
     };
 
-    const handleActivity = () => {
-      if (!interactionLockedRef.current) {
-        restartCycle();
-      }
-    };
+    startCycle(false);
+
+    const handleScroll =
+      () => {
+        if (
+          scrollFrame !== null
+        ) {
+          return;
+        }
+
+        scrollFrame =
+          window.requestAnimationFrame(
+            () => {
+              scrollFrame = null;
+
+              if (
+                scrollIdleTimer !==
+                null
+              ) {
+                window.clearTimeout(
+                  scrollIdleTimer,
+                );
+              }
+
+              scrollIdleTimer =
+                window.setTimeout(
+                  () => {
+                    scrollIdleTimer =
+                      null;
+
+                    if (
+                      !locked.current
+                    ) {
+                      startCycle(
+                        true,
+                      );
+                    }
+                  },
+                  SCROLL_IDLE_DELAY,
+                );
+            },
+          );
+      };
 
     window.addEventListener(
       "scroll",
       handleScroll,
-      { passive: true },
-    );
-
-    window.addEventListener(
-      "keydown",
-      handleActivity,
+      {
+        passive: true,
+      },
     );
 
     return () => {
+      clearCycle();
+
       window.removeEventListener(
         "scroll",
         handleScroll,
       );
 
-      window.removeEventListener(
-        "keydown",
-        handleActivity,
-      );
+      if (
+        scrollIdleTimer !==
+        null
+      ) {
+        window.clearTimeout(
+          scrollIdleTimer,
+        );
+      }
 
-      clearTimer(scrollIdleRef);
+      if (
+        scrollFrame !== null
+      ) {
+        window.cancelAnimationFrame(
+          scrollFrame,
+        );
+      }
     };
-  }, [enabled, restartCycle]);
+  }, [
+    enabled,
+    whatsappUrl,
+  ]);
 
   useEffect(() => {
     return () => {
-      clearTimer(tooltipRef);
-      clearTimer(hiddenReturnRef);
-      clearTimer(scrollIdleRef);
+      if (
+        tooltipTimer.current !==
+        null
+      ) {
+        window.clearTimeout(
+          tooltipTimer.current,
+        );
+      }
     };
   }, []);
 
-  const copy = useMemo(
-    () =>
-      language === "es"
-        ? {
-            up: "Inicio",
-            down: "Siguiente sección",
-            whatsapp: "Enviar WhatsApp",
-          }
-        : {
-            up: "Home",
-            down: "Next section",
-            whatsapp: "Send WhatsApp",
-          },
-    [language],
-  );
+  if (!enabled) {
+    return null;
+  }
 
-  const label = copy[mode];
-
-  const performAction = useCallback(
-    (actionMode: ActionMode) => {
-      if (
-        actionMode === "whatsapp" &&
-        whatsappUrl
-      ) {
-        window.open(
-          whatsappUrl,
-          "_blank",
-          "noopener,noreferrer",
-        );
-
-        return;
-      }
-
-      if (actionMode === "up") {
-        const hero =
-          document.getElementById("hero");
-
-        if (hero) {
-          scrollToSection(
-            hero,
-            Boolean(reduceMotion),
-          );
+  const labels =
+    language === "es"
+      ? {
+          whatsapp:
+            "Enviar WhatsApp",
+          down:
+            "Siguiente sección",
+          up:
+            "Inicio",
         }
+      : {
+          whatsapp:
+            "Send WhatsApp",
+          down:
+            "Next section",
+          up:
+            "Home",
+        };
 
-        return;
-      }
+  const label =
+    labels[mode];
 
-      const nextSection =
-        getNextSection();
+  const performAction = (
+    action:
+      ActionMode,
+  ) => {
+    if (
+      action ===
+        "whatsapp" &&
+      whatsappUrl
+    ) {
+      window.open(
+        whatsappUrl,
+        "_blank",
+        "noopener,noreferrer",
+      );
 
-      if (nextSection) {
-        scrollToSection(
-          nextSection,
-          Boolean(reduceMotion),
-        );
-      }
-    },
-    [reduceMotion, whatsappUrl],
-  );
+      return;
+    }
 
-  function handlePointerDown() {
-    interactionLockedRef.current = true;
-    pressedModeRef.current = mode;
-  }
+    if (
+      action === "up"
+    ) {
+      document
+        .getElementById(
+          "hero",
+        )
+        ?.scrollIntoView({
+          behavior:
+            "smooth",
+        });
 
-  function handlePointerUp() {
-    window.setTimeout(() => {
-      interactionLockedRef.current = false;
-      pressedModeRef.current = null;
-      restartCycle();
-    }, 250);
-  }
+      return;
+    }
 
-  function handleClick() {
-    performAction(
-      pressedModeRef.current ?? mode,
+    getNextSection()?.scrollIntoView(
+      {
+        behavior:
+          "smooth",
+      },
     );
-  }
-
-  function handleMouseEnter() {
-    interactionLockedRef.current = true;
-    showTooltip();
-  }
-
-  function handleMouseLeave() {
-    interactionLockedRef.current = false;
-    setTooltipVisible(false);
-    restartCycle();
-  }
-
-  function handleFocus() {
-    interactionLockedRef.current = true;
-    showTooltip();
-  }
-
-  function handleBlur() {
-    interactionLockedRef.current = false;
-    setTooltipVisible(false);
-    restartCycle();
-  }
+  };
 
   return (
-    <AnimatePresence>
-      {visible ? (
-        <motion.div
-          initial={
-            reduceMotion
-              ? false
-              : {
-                  opacity: 0,
-                  y: 10,
-                  scale: 0.94,
-                }
-          }
-          animate={{
-            opacity: 1,
-            y: 0,
-            scale: 1,
-          }}
-          exit={
-            reduceMotion
-              ? { opacity: 0 }
-              : {
-                  opacity: 0,
-                  y: 6,
-                  scale: 0.96,
-                }
-          }
-          transition={{
-            duration: reduceMotion ? 0 : 0.5,
-            ease: [0.22, 1, 0.36, 1],
-          }}
-          style={{
-            right:
-              "max(1rem, env(safe-area-inset-right))",
-            bottom:
-              "max(1rem, env(safe-area-inset-bottom))",
-          }}
-          className="fixed z-40 flex items-center gap-2.5"
-        >
-          <AnimatePresence
-            mode="wait"
-            initial={false}
-          >
-            {tooltipVisible ? (
-              <motion.div
-                key={`${mode}-tooltip`}
-                initial={
-                  reduceMotion
-                    ? false
-                    : {
-                        opacity: 0,
-                        x: 6,
-                        scale: 0.98,
-                      }
-                }
-                animate={{
-                  opacity: 1,
-                  x: 0,
-                  scale: 1,
-                }}
-                exit={
-                  reduceMotion
-                    ? { opacity: 0 }
-                    : {
-                        opacity: 0,
-                        x: 4,
-                        scale: 0.99,
-                      }
-                }
-                transition={{
-                  duration: reduceMotion ? 0 : 0.32,
-                  ease: [0.22, 1, 0.36, 1],
-                }}
-                className={[
-                  "pointer-events-none rounded-full border px-3 py-1.5 text-[0.66rem] font-medium leading-none shadow-[0_8px_24px_rgba(0,0,0,0.22)] backdrop-blur-md sm:text-[0.7rem]",
-                  mode === "whatsapp"
-                    ? "border-[#25D366]/30 bg-[#173523]/95 text-[#79e99e]"
-                    : "border-white/10 bg-surface-2/92 text-foreground-muted",
-                ].join(" ")}
-              >
-                {label}
-              </motion.div>
-            ) : null}
-          </AnimatePresence>
+    <div
+      style={{
+        right:
+          "max(1rem, env(safe-area-inset-right))",
 
-          <motion.button
-            type="button"
-            onClick={handleClick}
-            onPointerDown={handlePointerDown}
-            onPointerUp={handlePointerUp}
-            onPointerCancel={handlePointerUp}
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-            aria-label={label}
-            title={label}
-            whileTap={
-              reduceMotion
-                ? undefined
-                : { scale: 0.95 }
-            }
-            animate={{
-              backgroundColor:
-                mode === "whatsapp"
-                  ? "#25D366"
-                  : "rgba(25,25,28,0.94)",
-              borderColor:
-                mode === "whatsapp"
-                  ? "rgba(37,211,102,0.52)"
-                  : "rgba(255,255,255,0.10)",
-            }}
-            transition={{
-              backgroundColor: {
-                duration: reduceMotion
-                  ? 0
-                  : BUTTON_COLOR_TRANSITION_DURATION,
-                ease: [0.22, 1, 0.36, 1],
-              },
-              borderColor: {
-                duration: reduceMotion
-                  ? 0
-                  : BUTTON_COLOR_TRANSITION_DURATION,
-                ease: [0.22, 1, 0.36, 1],
-              },
-            }}
-            className="flex size-12 shrink-0 items-center justify-center rounded-full border text-white shadow-[0_10px_35px_rgba(0,0,0,0.32)] backdrop-blur-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/25"
-          >
-            <AnimatePresence
-              initial={false}
-              mode="sync"
-            >
-              <motion.span
-                key={mode}
-                initial={
-                  reduceMotion
-                    ? false
-                    : {
-                        opacity: 0,
-                        scale: 0.88,
-                      }
-                }
-                animate={{
-                  opacity: 1,
-                  scale: 1,
-                }}
-                exit={
-                  reduceMotion
-                    ? {
-                        opacity: 0,
-                      }
-                    : {
-                        opacity: 0,
-                        scale: 0.88,
-                      }
-                }
-                transition={{
-                  duration: reduceMotion
-                    ? 0
-                    : ICON_TRANSITION_DURATION,
-                  ease: [0.22, 1, 0.36, 1],
-                }}
-                className="absolute flex size-5.5 items-center justify-center"
-              >
-                {mode === "up" ? (
-                  <ChevronUp
-                    aria-hidden="true"
-                    className="size-full"
-                  />
-                ) : mode === "down" ? (
-                  <ChevronDown
-                    aria-hidden="true"
-                    className="size-full"
-                  />
-                ) : (
-                  <WhatsAppIcon className="size-full" />
-                )}
-              </motion.span>
-            </AnimatePresence>
-          </motion.button>
-        </motion.div>
-      ) : null}
-    </AnimatePresence>
+        bottom:
+          "max(1rem, env(safe-area-inset-bottom))",
+
+        opacity:
+          visible
+            ? 1
+            : 0,
+
+        transform:
+          visible
+            ? "translate3d(0,0,0) scale(1)"
+            : "translate3d(0,6px,0) scale(0.96)",
+
+        pointerEvents:
+          visible
+            ? "auto"
+            : "none",
+
+        transition: [
+          `opacity 500ms ${EASE}`,
+          `transform 500ms ${EASE}`,
+        ].join(
+          ", ",
+        ),
+
+        willChange:
+          "transform, opacity",
+      }}
+      className="fixed z-40 flex items-center gap-2.5"
+    >
+      <div
+        style={{
+          opacity:
+            tooltipVisible
+              ? 1
+              : 0,
+
+          transform:
+            tooltipVisible
+              ? "translate3d(0,0,0)"
+              : "translate3d(6px,0,0)",
+
+          transition: [
+            `opacity 320ms ${EASE}`,
+            `transform 320ms ${EASE}`,
+          ].join(
+            ", ",
+          ),
+
+          willChange:
+            "transform, opacity",
+        }}
+        className={[
+          "pointer-events-none rounded-full border px-3 py-1.5",
+          "text-[0.66rem] font-medium leading-none",
+          "shadow-[0_8px_24px_rgba(0,0,0,0.22)]",
+
+          mode ===
+          "whatsapp"
+            ? "border-[#25D366]/30 bg-[#173523] text-[#79e99e]"
+            : "border-white/10 bg-[#19191c] text-foreground-muted",
+        ].join(
+          " ",
+        )}
+      >
+        {label}
+      </div>
+
+      <button
+        type="button"
+        aria-label={
+          label
+        }
+        title={
+          label
+        }
+        onClick={() =>
+          performAction(
+            pressedMode.current ??
+              mode,
+          )
+        }
+        onPointerDown={() => {
+          locked.current =
+            true;
+
+          pressedMode.current =
+            mode;
+        }}
+        onPointerUp={() => {
+          window.setTimeout(
+            () => {
+              locked.current =
+                false;
+
+              pressedMode.current =
+                null;
+
+              restartRef.current();
+            },
+            250,
+          );
+        }}
+        onPointerCancel={() => {
+          locked.current =
+            false;
+
+          pressedMode.current =
+            null;
+        }}
+        onMouseEnter={() => {
+          locked.current =
+            true;
+
+          showTooltip();
+        }}
+        onMouseLeave={() => {
+          locked.current =
+            false;
+
+          hideTooltip();
+
+          restartRef.current();
+        }}
+        onFocus={() => {
+          locked.current =
+            true;
+
+          showTooltip();
+        }}
+        onBlur={() => {
+          locked.current =
+            false;
+
+          hideTooltip();
+
+          restartRef.current();
+        }}
+        className="relative flex size-12 shrink-0 items-center justify-center"
+      >
+        <ButtonLayer
+          active={
+            mode ===
+            "whatsapp"
+          }
+          className="border-[#25D366]/50 bg-[#25D366]"
+        />
+
+        <ButtonLayer
+          active={
+            mode !==
+            "whatsapp"
+          }
+          className="border-white/10 bg-[#19191c]"
+        />
+
+        <ActionIcon
+          active={
+            mode ===
+            "whatsapp"
+          }
+        >
+          <WhatsAppIcon className="size-full" />
+        </ActionIcon>
+
+        <ActionIcon
+          active={
+            mode ===
+            "down"
+          }
+        >
+          <ChevronDown className="size-full" />
+        </ActionIcon>
+
+        <ActionIcon
+          active={
+            mode ===
+            "up"
+          }
+        >
+          <ChevronUp className="size-full" />
+        </ActionIcon>
+      </button>
+    </div>
+  );
+}
+
+function ButtonLayer({
+  active,
+  className,
+}: {
+  active: boolean;
+  className: string;
+}) {
+  return (
+    <span
+      aria-hidden="true"
+      style={{
+        opacity:
+          active
+            ? 1
+            : 0,
+
+        transition: `opacity 600ms ${EASE}`,
+
+        willChange:
+          "opacity",
+      }}
+      className={[
+        "absolute inset-0 rounded-full border",
+        "shadow-[0_10px_35px_rgba(0,0,0,0.32)]",
+        className,
+      ].join(
+        " ",
+      )}
+    />
+  );
+}
+
+function ActionIcon({
+  active,
+  children,
+}: {
+  active: boolean;
+  children: ReactNode;
+}) {
+  return (
+    <span
+      style={{
+        opacity:
+          active
+            ? 1
+            : 0,
+
+        transform:
+          active
+            ? "scale(1)"
+            : "scale(0.9)",
+
+        transition: [
+          `opacity 500ms ${EASE}`,
+          `transform 500ms ${EASE}`,
+        ].join(
+          ", ",
+        ),
+
+        willChange:
+          "transform, opacity",
+      }}
+      className="absolute z-10 flex size-5.5 items-center justify-center text-white"
+    >
+      {children}
+    </span>
   );
 }

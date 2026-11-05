@@ -10,6 +10,8 @@ import { otherProjects } from "@/data/projects";
 import { useLanguage } from "@/i18n/LanguageProvider";
 import { localizeProjects } from "@/i18n/translations";
 
+import "@/styles/other-work.css";
+
 export function OtherWork() {
   const {
     language,

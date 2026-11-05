@@ -8,3 +8,37 @@
 #OtherWork {
   padding-top: calc(var(--section-space-y) + 3rem);
 }
+
+/*
+ * Mobile autoplay progress.
+ *
+ * CSS transform animation keeps the progress line on the
+ * compositor instead of driving it through React/Motion.
+ */
+.other-work-mobile-progress {
+  width: 100%;
+  transform: scaleX(0);
+  transform-origin: left center;
+  will-change: transform;
+
+  animation-name: other-work-mobile-progress;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+@keyframes other-work-mobile-progress {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .other-work-mobile-progress {
+    animation: none;
+    transform: scaleX(1);
+  }
+}
