@@ -118,7 +118,7 @@ export const translations = {
             title: "Material de apoyo",
             text: "Teoría y ejercicios para continuar practicando después de la clase.",
           },
-        ],        
+        ],
         technologiesTitle: "Lenguajes y tecnologías",
         technologiesText:
           "Tecnologías y lenguajes adaptados a la materia, carrera o proyecto.",
@@ -126,6 +126,43 @@ export const translations = {
         testimonialsTitle: "Experiencias de alumnos",
         testimonialsText:
           "Este espacio quedará preparado para incorporar testimonios reales y el acceso directo a mi publicación de Mercado Libre.",
+      },
+    },
+    testimonialsContact: {
+      eyebrow: "Testimonios & contacto",
+      title: "Experiencias reales.",
+      testimonialsLabel: "Experiencias de alumnos y clientes",
+      testimonialsDescription:
+        "Testimonios de personas con las que trabajé en clases y proyectos.",
+      emptyTestimonials:
+        "Todavía no hay testimonios publicados.",
+      contact: {
+        title: "Contacto",
+        description:
+          "Ingresa tus datos y un medio de contacto. Me comunicaré personalmente para conocer tu consulta.",
+        name: "Nombre",
+        email: "Email",
+        whatsapp: "WhatsApp",
+        emailPlaceholder: "nombre@correo.com",
+        whatsappPlaceholder: "Ej. +34 612 345 678",
+        optionalMessage: "Agregar comentario (opcional)",
+        messagePlaceholder:
+          "Breve detalle de tu consulta...",
+        submit: "Solicitar contacto",
+        sending: "Enviando...",
+        success:
+          "Consulta enviada. Me pondré en contacto contigo lo antes posible!",
+        submitError:
+          "No se pudo enviar la consulta. Intenta nuevamente.",
+        emailSubject:
+          "Nueva consulta desde el portfolio",
+        nameRequired: "Ingresa tu nombre.",
+        emailRequired: "Ingresa un email.",
+        emailInvalid: "Ingresa un email válido.",
+        whatsappRequired:
+          "Ingresa un número de WhatsApp.",
+        whatsappInvalid:
+          "Ej: +34 612 345 678",
       },
     },
     language: {
@@ -247,7 +284,7 @@ export const translations = {
             title: "Support material",
             text: "Theory and exercises to keep practicing after each lesson.",
           },
-        ],        
+        ],
         technologiesTitle: "Languages & technologies",
         technologiesText:
           "Technologies and languages adapted to the subject, degree or project.",
@@ -255,6 +292,44 @@ export const translations = {
         testimonialsTitle: "Student experiences",
         testimonialsText:
           "This space is ready to include real testimonials and direct access to my Mercado Libre listing.",
+      },
+    },
+    testimonialsContact: {
+      eyebrow: "Testimonials & contact",
+      title: "Real experiences.",
+      testimonialsLabel: "Students & clients",
+      testimonialsDescription:
+        "Feedback from people I have worked with through programming lessons and development projects.",
+      emptyTestimonials:
+        "There are no published testimonials yet.",
+      contact: {
+        title: "Contact",
+        description:
+          "Enter your details and a contact method. I’ll get in touch personally to learn more about your inquiry.",
+        name: "Name",
+        email: "Email",
+        whatsapp: "WhatsApp",
+        emailPlaceholder: "name@email.com",
+        whatsappPlaceholder: "E.g. +44 7700 900123",
+        optionalMessage: "Add a note (optional)",
+        messagePlaceholder:
+          "Briefly describe your inquiry...",
+        submit: "Request contact",
+        sending: "Sending...",
+        success:
+          "Message sent. I’ll get in touch with you.",
+        submitError:
+          "The message could not be sent. Please try again.",
+        emailSubject:
+          "New inquiry from the portfolio",
+        nameRequired: "Enter your name.",
+        emailRequired: "Enter an email address.",
+        emailInvalid:
+          "Enter a valid email address.",
+        whatsappRequired:
+          "Enter a WhatsApp number.",
+        whatsappInvalid:
+          "E.g. +44 7700 900123",
       },
     },
     language: {

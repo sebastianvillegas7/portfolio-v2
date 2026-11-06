@@ -6,26 +6,36 @@ import {
   useState,
 } from "react";
 import Autoplay from "embla-carousel-autoplay";
+import {
+  useInView,
+  useReducedMotion,
+} from "motion/react";
 
+import { TestimonialCard } from "@/components/testimonials/TestimonialCard";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
   type CarouselApi,
 } from "@/components/ui/carousel";
-import { TestimonialCard } from "@/components/testimonials/TestimonialCard";
 import type { PublicTestimonial } from "@/features/testimonials/types";
+import { useLanguage } from "@/i18n/LanguageProvider";
 
 type Props = {
   testimonials: PublicTestimonial[];
-  language: "es" | "en";
 };
 
 export function TestimonialsCarousel({
   testimonials,
-  language,
 }: Props) {
+  const { language, t } = useLanguage();
+  const reduceMotion = useReducedMotion();
+
   const rootRef = useRef<HTMLDivElement>(null);
+  const inView = useInView(rootRef, {
+    amount: 0.25,
+  });
+
   const [api, setApi] = useState<CarouselApi>();
   const [selectedIndex, setSelectedIndex] =
     useState(0);
@@ -33,7 +43,8 @@ export function TestimonialsCarousel({
   const [autoplay] = useState(() =>
     Autoplay({
       delay: 5800,
-      stopOnInteraction: false,
+      playOnInit: false,
+      stopOnInteraction: true,
       stopOnMouseEnter: true,
     }),
   );
@@ -47,7 +58,9 @@ export function TestimonialsCarousel({
     }
 
     const syncSelectedIndex = () => {
-      setSelectedIndex(api.selectedScrollSnap());
+      setSelectedIndex(
+        api.selectedScrollSnap(),
+      );
     };
 
     syncSelectedIndex();
@@ -63,74 +76,48 @@ export function TestimonialsCarousel({
   useEffect(() => {
     if (
       !hasMultiple ||
-      !rootRef.current
+      reduceMotion ||
+      !inView
     ) {
+      autoplay.stop();
       return;
     }
 
-    const root = rootRef.current;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (
-          entry.isIntersecting &&
-          document.visibilityState === "visible"
-        ) {
-          autoplay.play();
-        } else {
-          autoplay.stop();
-        }
-      },
-      {
-        threshold: 0.25,
-      },
-    );
-
-    const handleVisibilityChange = () => {
+    const syncAutoplay = () => {
       if (
-        document.visibilityState === "hidden"
+        document.visibilityState === "visible"
       ) {
-        autoplay.stop();
-        return;
-      }
-
-      const rect =
-        root.getBoundingClientRect();
-      const viewportHeight =
-        window.innerHeight ||
-        document.documentElement.clientHeight;
-
-      const visible =
-        rect.bottom > 0 &&
-        rect.top < viewportHeight;
-
-      if (visible) {
         autoplay.play();
+      } else {
+        autoplay.stop();
       }
     };
 
-    observer.observe(root);
+    syncAutoplay();
+
     document.addEventListener(
       "visibilitychange",
-      handleVisibilityChange,
+      syncAutoplay,
     );
 
     return () => {
-      observer.disconnect();
       document.removeEventListener(
         "visibilitychange",
-        handleVisibilityChange,
+        syncAutoplay,
       );
       autoplay.stop();
     };
-  }, [autoplay, hasMultiple]);
+  }, [
+    autoplay,
+    hasMultiple,
+    inView,
+    reduceMotion,
+  ]);
 
   if (testimonials.length === 0) {
     return (
       <div className="mx-4 rounded-[1.4rem] border border-white/10 bg-surface-2 p-5 text-sm text-foreground-muted sm:mx-5 sm:p-6">
-        {language === "es"
-          ? "Todavía no hay testimonios publicados."
-          : "There are no published testimonials yet."}
+        {t.testimonialsContact.emptyTestimonials}
       </div>
     );
   }
@@ -144,7 +131,9 @@ export function TestimonialsCarousel({
           align: "center",
         }}
         plugins={
-          hasMultiple ? [autoplay] : []
+          hasMultiple && !reduceMotion
+            ? [autoplay]
+            : []
         }
       >
         <CarouselContent className="items-stretch">
@@ -153,6 +142,7 @@ export function TestimonialsCarousel({
               <CarouselItem
                 key={testimonial.id}
                 className="basis-[86%] sm:basis-[72%]"
+                aria-label={`${index + 1} / ${testimonials.length}`}
               >
                 <TestimonialCard
                   testimonial={testimonial}
@@ -178,8 +168,8 @@ export function TestimonialsCarousel({
                   key={testimonial.id}
                   className={
                     index === selectedIndex
-                      ? "h-1.5 w-5 rounded-full bg-foreground/70 transition-[width,background-color] duration-300"
-                      : "size-1.5 rounded-full bg-white/18 transition-colors duration-300"
+                      ? "h-1.5 w-5 rounded-full bg-foreground/70 transition-[width,background-color] duration-300 motion-reduce:transition-none"
+                      : "size-1.5 rounded-full bg-white/18 transition-colors duration-300 motion-reduce:transition-none"
                   }
                 />
               ),

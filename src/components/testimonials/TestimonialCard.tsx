@@ -93,7 +93,7 @@ export function TestimonialCard({
   return (
     <article
       className={cn(
-        "testimonial-card relative overflow-hidden rounded-[1.45rem] border p-3.5 transition-[opacity,transform,border-color] duration-300 sm:rounded-[1.55rem] sm:p-5",
+        "testimonial-card relative overflow-hidden rounded-[1.45rem] border p-3.5 transition-[opacity,transform,border-color] duration-300 motion-reduce:transform-none motion-reduce:transition-none sm:rounded-[1.55rem] sm:p-5",
         active
           ? "testimonial-card--active scale-100 opacity-100"
           : "scale-[0.98] opacity-40",
@@ -106,7 +106,7 @@ export function TestimonialCard({
               src={testimonial.photoUrl}
               alt=""
               fill
-              sizes="52px"              
+              sizes="52px"
               className="object-cover"
             />
           ) : (
@@ -138,12 +138,11 @@ export function TestimonialCard({
 
         <Quote
           aria-hidden="true"
-          className="mt-0.5 size-5 shrink-0 text-foreground-subtle/35 sm:size-6"
+          className="mt-0.5 size-5 shrink-0 fill-brand-500/20 text-brand-soft/65 sm:size-6"
         />
       </header>
 
-      {testimonial.technologies.length >
-      0 ? (
+      {testimonial.technologies.length > 0 ? (
         <div className="mt-3.5 sm:mt-4">
           <div className="mb-2 flex items-center gap-1.5 text-[0.61rem] font-semibold uppercase tracking-[0.13em] text-foreground-subtle sm:text-[0.63rem]">
             <Code2
@@ -195,8 +194,7 @@ export function TestimonialCard({
                 aria-hidden="true"
                 className={cn(
                   "size-3.5",
-                  index <
-                    testimonial.rating
+                  index < testimonial.rating
                     ? "fill-foreground text-foreground"
                     : "text-foreground-subtle/35",
                 )}
