@@ -1,6 +1,6 @@
 "use client";
 
-import Three from "@/components/animata/bento-grid/three";
+import ServicesBento from "@/components/services/ServicesBento";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { useLanguage } from "@/i18n/LanguageProvider";
 
@@ -21,7 +21,7 @@ export function Services() {
           className="mb-10 md:mb-14"
         />
 
-        <Three />
+        <ServicesBento />
       </div>
     </section>
   );

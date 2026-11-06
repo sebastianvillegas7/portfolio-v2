@@ -5,6 +5,7 @@ import {
   ChevronUp,
 } from "lucide-react";
 import {
+  useCallback,
   useEffect,
   useRef,
   useState,
@@ -129,47 +130,27 @@ export function SmartFloatingAction() {
       null,
     );
 
-  const showTooltip = () => {
-    if (
-      tooltipTimer.current !==
-      null
-    ) {
-      window.clearTimeout(
-        tooltipTimer.current,
-      );
+  const showTooltip = useCallback(() => {
+    if (tooltipTimer.current !== null) {
+      window.clearTimeout(tooltipTimer.current);
     }
 
     setTooltipVisible(true);
 
-    tooltipTimer.current =
-      window.setTimeout(
-        () => {
-          tooltipTimer.current =
-            null;
+    tooltipTimer.current = window.setTimeout(() => {
+      tooltipTimer.current = null;
+      setTooltipVisible(false);
+    }, TOOLTIP_DELAY);
+  }, []);
 
-          setTooltipVisible(
-            false,
-          );
-        },
-        TOOLTIP_DELAY,
-      );
-  };
-
-  const hideTooltip = () => {
-    if (
-      tooltipTimer.current !==
-      null
-    ) {
-      window.clearTimeout(
-        tooltipTimer.current,
-      );
-
-      tooltipTimer.current =
-        null;
+  const hideTooltip = useCallback(() => {
+    if (tooltipTimer.current !== null) {
+      window.clearTimeout(tooltipTimer.current);
+      tooltipTimer.current = null;
     }
 
     setTooltipVisible(false);
-  };
+  }, []);
 
   useEffect(() => {
     const activate = () => {
@@ -212,7 +193,7 @@ export function SmartFloatingAction() {
         activate,
       );
     };
-  }, []);
+  }, [showTooltip, whatsappUrl]);
 
   useEffect(() => {
     if (!enabled) {
@@ -440,6 +421,8 @@ export function SmartFloatingAction() {
   }, [
     enabled,
     whatsappUrl,
+    showTooltip,
+    hideTooltip,
   ]);
 
   useEffect(() => {
