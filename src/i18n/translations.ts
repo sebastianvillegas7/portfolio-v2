@@ -118,22 +118,7 @@ export const translations = {
             title: "Material de apoyo",
             text: "Teoría y ejercicios para continuar practicando después de la clase.",
           },
-        ],
-        progressItems: [
-          {
-            title: "Entender",
-            text: "Explicación clara y adaptada.",
-          },
-          {
-            title: "Practicar",
-            text: "Ejercicios guiados en vivo.",
-          },
-          {
-            title: "Avanzar",
-            text: "Corrección y siguiente paso.",
-          },
-        ],
-        progressFeedback: "✓ Bien resuelto",
+        ],        
         technologiesTitle: "Lenguajes y tecnologías",
         technologiesText:
           "Tecnologías y lenguajes adaptados a la materia, carrera o proyecto.",
@@ -262,22 +247,7 @@ export const translations = {
             title: "Support material",
             text: "Theory and exercises to keep practicing after each lesson.",
           },
-        ],
-        progressItems: [
-          {
-            title: "Understand",
-            text: "Clear, tailored explanation.",
-          },
-          {
-            title: "Practice",
-            text: "Guided live exercises.",
-          },
-          {
-            title: "Progress",
-            text: "Feedback and next step.",
-          },
-        ],
-        progressFeedback: "✓ Well done",
+        ],        
         technologiesTitle: "Languages & technologies",
         technologiesText:
           "Technologies and languages adapted to the subject, degree or project.",

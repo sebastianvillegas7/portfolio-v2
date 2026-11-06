@@ -2,16 +2,20 @@
 
 import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
-import { motion } from "motion/react";
+import {
+  motion,
+  useReducedMotion,
+} from "motion/react";
 
 import { cardVariants } from "@/components/services/ServiceGroup";
 import { useLanguage } from "@/i18n/LanguageProvider";
 
 const MERCADO_LIBRE_URL =
-  "https://servicio.mercadolibre.com.ar/MLA-2047102089-clases-programacion-python-java-javascript-online-_JM?callback_url=https%3A%2F%2Fvendedores.mercadolibre.com.ar%2Fpublicaciones%23from%3Dseller-menu";
+  "https://servicio.mercadolibre.com.ar/MLA-2047102089-clases-programacion-python-java-javascript-online-_JM";
 
 export function MPagoServiceCard({ active }: { active: boolean }) {
   const { language } = useLanguage();
+  const shouldReduceMotion = useReducedMotion();
 
   const copy =
     language === "es"
@@ -29,6 +33,8 @@ export function MPagoServiceCard({ active }: { active: boolean }) {
           imageAlt:
             "Preview of the programming lessons listing on Mercado Libre",
         };
+
+  const sheenActive = active && !shouldReduceMotion;
 
   return (
     <motion.article
@@ -57,12 +63,12 @@ export function MPagoServiceCard({ active }: { active: boolean }) {
               aria-hidden="true"
               className="pointer-events-none absolute inset-y-0 -left-1/3 w-1/3 bg-gradient-to-r from-transparent via-white/30 to-transparent"
               animate={
-                active
+                sheenActive
                   ? { x: ["0%", "420%"] }
                   : { x: "0%" }
               }
               transition={
-                active
+                sheenActive
                   ? {
                       duration: 1.15,
                       repeat: Infinity,
